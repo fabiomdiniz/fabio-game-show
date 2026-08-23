@@ -73,6 +73,7 @@ export interface BoardGameConfig {
 }
 export interface BoardGameState {
   winners: string[]
+  pointValue: number
 }
 export type BoardGameAction = { type: 'award'; winnerIds: string[] }
 

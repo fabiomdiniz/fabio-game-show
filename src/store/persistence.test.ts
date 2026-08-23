@@ -55,7 +55,7 @@ describe('persistence', () => {
       kind: 'boardGame',
       status: 'inProgress',
       config: { name: 'Catan', pointValue: 5 },
-      state: { winners: ['missing-id'] },
+      state: { winners: ['missing-id'], pointValue: 5 },
       initialPoints: {},
       appliedDeltas: [],
     }
@@ -72,7 +72,7 @@ describe('persistence', () => {
     }
     expect(
       validateState(
-        mk({ id: 'a', kind: 'boardGame', status: 'inProgress', config: { name: 'X', pointValue: 0 }, state: { winners: [] }, initialPoints: {}, appliedDeltas: [] }),
+        mk({ id: 'a', kind: 'boardGame', status: 'inProgress', config: { name: 'X', pointValue: 0 }, state: { winners: [], pointValue: 0 }, initialPoints: {}, appliedDeltas: [] }),
       ),
     ).toMatch(/pointValue/)
 
@@ -96,7 +96,7 @@ describe('persistence', () => {
       kind: 'boardGame',
       status: 'finished',
       config: { name: 'Catan', pointValue: 5 },
-      state: { winners: ['deleted-id'] },
+      state: { winners: ['deleted-id'], pointValue: 5 },
       initialPoints: {},
       appliedDeltas: [{ participantId: 'deleted-id', participantName: 'Old Player', delta: 5 }],
       result: { awards: [{ participantId: 'deleted-id', participantName: 'Old Player', delta: 5 }] },

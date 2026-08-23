@@ -27,7 +27,7 @@ describe('GameInstance discriminated union', () => {
       kind: 'boardGame',
       status: 'setup',
       config: { name: 'Catan', pointValue: 5 },
-      state: { winners: [] },
+      state: { winners: [], pointValue: 5 },
       initialPoints: {},
       appliedDeltas: [],
     }

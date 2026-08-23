@@ -20,7 +20,7 @@ function boardGameInstance(winners: string[]): GameInstance {
     kind: 'boardGame',
     status: 'setup',
     config: { name: 'Catan', pointValue: 5 },
-    state: { winners },
+    state: { winners, pointValue: 5 },
     initialPoints: {},
     appliedDeltas: [],
   }
