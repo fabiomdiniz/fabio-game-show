@@ -78,7 +78,7 @@ describe('persistence', () => {
 
     expect(
       validateState(
-        mk({ id: 'b', kind: 'fighting', status: 'inProgress', config: { firstPlacePoints: 5, secondPlacePoints: 10, entrants: [] }, state: { rounds: [] }, initialPoints: {}, appliedDeltas: [] }),
+        mk({ id: 'b', kind: 'fighting', status: 'inProgress', config: { firstPlacePoints: 5, secondPlacePoints: 10, entrants: [] }, state: { rounds: [], firstPlacePoints: 5, secondPlacePoints: 10 }, initialPoints: {}, appliedDeltas: [] }),
       ),
     ).toMatch(/secondPlacePoints/)
 

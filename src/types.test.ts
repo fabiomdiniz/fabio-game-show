@@ -40,7 +40,7 @@ describe('GameInstance discriminated union', () => {
       kind: 'fighting',
       status: 'inProgress',
       config: { firstPlacePoints: 10, secondPlacePoints: 5, entrants: ['a', 'b'] },
-      state: { rounds: [] },
+      state: { rounds: [], firstPlacePoints: 10, secondPlacePoints: 5 },
       initialPoints: { a: 0, b: 0 },
       appliedDeltas: [],
     }

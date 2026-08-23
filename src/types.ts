@@ -92,6 +92,8 @@ export interface FightingMatch {
 }
 export interface FightingState {
   rounds: FightingMatch[][]
+  firstPlacePoints: number
+  secondPlacePoints: number
 }
 export type FightingAction = { type: 'advance'; matchId: string; winnerId: string }
 
