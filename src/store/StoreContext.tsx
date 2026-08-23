@@ -72,6 +72,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           delta: d.delta,
         }))
         dispatch({ type: 'applyGameAction', gameId, state: result.state, deltas })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((def.isFinished as any)(result.state)) dispatch({ type: 'finishGame', gameId })
       },
       finishGame(gameId) {
         dispatch({ type: 'finishGame', gameId })
