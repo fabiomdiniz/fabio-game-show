@@ -1,0 +1,72 @@
+/* Hallmark · theme: custom (tuned) · name: "Overdrive" · vibe: "gold sun, indigo lettering, green hills, red pop"
+ * inspired-by: Sonic Mania UI (Sega) — structural + colour DNA only, no assets copied
+ * paper: oklch(84% 0.160 90) · ink: oklch(27% 0.200 275) · accent: oklch(38% 0.170 26) · accent-2: oklch(48% 0.120 125)
+ * display: Bricolage Grotesque 800 · body: Geist · outlier: Geist Mono
+ * axes: light / display-heavy / chromatic-red ~26° (secondary chromatic-green ~125°) · studied: yes · DNA-source: url + image reference
+ * pre-emit critique: P5 H4 E5 S4 R4 V5
+ */
+
+:root {
+  /* ---- type ---- */
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-outlier: "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ---- colour (OKLCH, gold-sun arcade) ---- */
+  --color-paper:    oklch(84% 0.160 90);    /* bright gold — the sun */
+  --color-paper-2:  oklch(92% 0.100 95);    /* cream — lighter surface */
+  --color-paper-3:  oklch(78% 0.150 90);    /* deeper gold — elevation */
+  --color-rule:     oklch(70% 0.120 90);    /* gold-brown rule */
+  --color-rule-2:   oklch(76% 0.125 90);
+  --color-neutral:  oklch(58% 0.085 95);    /* olive-tinted neutral */
+  --color-muted:    oklch(47% 0.075 95);    /* darker warm muted */
+  --color-ink:      oklch(27% 0.200 275);   /* deep indigo — lettering */
+  --color-ink-2:    oklch(38% 0.170 275);   /* softer indigo */
+
+  --color-accent:     oklch(38% 0.170 26);   /* sega red */
+  --color-accent-2:   oklch(48% 0.120 125);  /* green hill */
+  --color-accent-ink: oklch(97% 0.010 90);   /* cream text on red */
+  --color-focus:      oklch(32% 0.200 26);   /* red focus ring */
+
+  /* ---- hills (decorative landscape, tokenized) ---- */
+  --color-hill-1: oklch(76% 0.085 125);      /* light sage (back) */
+  --color-hill-2: oklch(58% 0.105 125);      /* olive (mid) */
+  --color-hill-3: oklch(32% 0.055 340);      /* plum (front band) */
+
+  /* ---- space (4pt scale) ---- */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+  --space-2xl: 8rem;
+
+  /* ---- type scale (1.25) ---- */
+  --text-xs: 0.64rem;
+  --text-sm: 0.8rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-3xl: 3.0518rem;
+  --text-4xl: 3.8147rem;
+  --text-display:   clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-display-s: clamp(2rem, 3.5vw + 0.75rem, 3.5rem);
+
+  /* ---- easing ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---- durations ---- */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 420ms;
+
+  /* ---- radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+}

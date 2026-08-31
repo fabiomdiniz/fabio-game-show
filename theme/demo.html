@@ -1,0 +1,250 @@
+<!doctype html>
+<!-- Hallmark · theme demo: Overdrive · studied DNA from Sonic Mania UI (structural only) -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Overdrive — a Hallmark theme</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    /* Hallmark · macrostructure: Manifesto → Catalogue · theme: Overdrive (custom) · studied: yes */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: var(--text-base);
+      line-height: 1.55;
+      color: var(--color-ink);
+      background: var(--color-paper);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+
+    .wrap { max-width: 1120px; margin-inline: auto; padding-inline: clamp(1.25rem, 4vw, 3rem); }
+
+    /* ---- nav ---- */
+    .nav { display: flex; align-items: center; justify-content: space-between; padding-block: var(--space-md); }
+    .wordmark { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.01em; font-size: var(--text-md); color: var(--color-ink); }
+    .wordmark .dot { color: var(--color-accent); }
+    .nav-links { display: flex; gap: var(--space-lg); }
+    .nav-links a {
+      font-family: var(--font-outlier); font-size: var(--text-xs); letter-spacing: 0.12em;
+      text-transform: uppercase; text-decoration: none; color: var(--color-ink-2);
+    }
+    .nav-links a:hover { color: var(--color-accent); }
+
+    /* ---- hero ---- */
+    .hero { position: relative; overflow: hidden; padding-block: var(--space-2xl) var(--space-xl); }
+    .sunburst {
+      position: absolute; inset: -40% -20% auto; aspect-ratio: 1; z-index: 0; pointer-events: none;
+      background: repeating-conic-gradient(from 0deg, var(--color-paper) 0deg 9deg, var(--color-paper-2) 9deg 18deg);
+      -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 68%);
+      mask-image: radial-gradient(circle at center, #000 0%, transparent 68%);
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 760px; }
+    .eyebrow {
+      font-family: var(--font-outlier); font-size: var(--text-xs); letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--color-accent); margin: 0 0 var(--space-sm);
+    }
+    h1.display {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: var(--text-display); line-height: 1.02; letter-spacing: -0.02em;
+      margin: 0; text-transform: uppercase; color: var(--color-ink);
+    }
+    .lede { max-width: 54ch; color: var(--color-ink-2); margin: var(--space-md) 0 var(--space-lg); font-size: var(--text-md); }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: var(--font-outlier); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      font-size: var(--text-sm); text-decoration: none; cursor: pointer;
+      padding: 0.7rem 1.4rem; border-radius: var(--radius-sm); border: 1px solid transparent;
+      transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out),
+                  background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+      white-space: nowrap;
+    }
+    .btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: var(--color-accent); color: var(--color-accent-ink);
+      box-shadow: inset 0 -3px 0 color-mix(in oklch, var(--color-ink) 25%, transparent);
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-ghost { border-color: var(--color-rule); color: var(--color-ink); }
+    .btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+    /* ---- checker track ---- */
+    .checker {
+      height: 12px;
+      background: repeating-conic-gradient(var(--color-paper-3) 0% 25%, var(--color-paper-2) 0% 50%) 0 0 / 24px 24px;
+    }
+
+    /* ---- HUD stat strip ---- */
+    .hud { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-md); padding-block: var(--space-xl); }
+    .stat { background: var(--color-paper-2); border-radius: var(--radius-md); padding: var(--space-md); }
+    .stat .label {
+      font-family: var(--font-outlier); font-size: var(--text-xs); letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--color-muted); margin: 0;
+    }
+    .stat .value {
+      font-family: var(--font-outlier); font-weight: 500; font-variant-numeric: tabular-nums;
+      font-size: var(--text-2xl); margin: var(--space-xs) 0 0; color: var(--color-ink);
+    }
+
+    /* ---- zone select ---- */
+    .section { padding-block: var(--space-xl); }
+    .section-head { max-width: 60ch; }
+    .eyebrow.alt { color: var(--color-accent-2); }
+    h2.head {
+      font-family: var(--font-display); font-weight: 800; font-size: var(--text-3xl);
+      line-height: 1.06; letter-spacing: -0.015em; margin: 0; text-transform: uppercase; color: var(--color-ink);
+    }
+    .zones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-md); margin-top: var(--space-lg); }
+    .zone {
+      display: block; text-decoration: none; background: var(--color-paper-2);
+      border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-lg);
+      transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+    }
+    .zone:hover { transform: translateY(-2px); border-color: var(--color-accent); }
+    .zone:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+    .zone .num { font-family: var(--font-outlier); color: var(--color-accent-2); font-size: var(--text-sm); }
+    .zone .name { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); margin: var(--space-sm) 0 var(--space-xs); text-transform: uppercase; color: var(--color-ink); }
+    .zone .sub { color: var(--color-muted); font-size: var(--text-sm); margin: 0; }
+
+    /* ---- controls ---- */
+    .controls { display: flex; flex-direction: column; gap: var(--space-sm); max-width: 460px; }
+    .key { display: flex; justify-content: space-between; border-bottom: 1px solid var(--color-rule-2); padding-block: var(--space-sm); }
+    .key .k { font-family: var(--font-outlier); color: var(--color-accent); }
+    .key .a { font-family: var(--font-outlier); color: var(--color-ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
+
+    /* ---- hills (decorative ground) ---- */
+    .hills { position: relative; height: 150px; overflow: hidden; }
+    .hills svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* ---- footer ---- */
+    footer { background: var(--color-hill-3); padding-block: var(--space-xl); }
+    footer .foot { display: flex; flex-wrap: wrap; gap: var(--space-md); justify-content: space-between; align-items: center; }
+    footer .wordmark { color: var(--color-paper-2); }
+    footer .wordmark .dot { color: var(--color-accent); }
+    footer small { color: var(--color-paper-2); opacity: 0.8; font-family: var(--font-outlier); font-size: var(--text-xs); }
+
+    /* ---- one orchestrated entrance ---- */
+    @keyframes drop-in {
+      0%   { opacity: 0; transform: translateY(-18px); }
+      72%  { opacity: 1; transform: translateY(4px); }
+      100% { transform: translateY(0); }
+    }
+    .hero-inner { animation: drop-in 420ms var(--ease-out) both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-inner { animation: none; }
+      .zone, .btn { transition: none; }
+    }
+    @media (max-width: 768px) {
+      .zones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 414px) {
+      .zones { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap nav">
+    <span class="wordmark">OVER<span class="dot">DRIVE</span></span>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#zones">Zones</a>
+      <a href="#controls">Controls</a>
+      <a href="#hud">Stats</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="sunburst" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Insert coin · 1994</p>
+      <h1 class="display">Overdrive</h1>
+      <p class="lede">A retro-future arcade racer on a gold sun, indigo lettering, and green hills. Made, not generated.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#zones">Play now</a>
+        <a class="btn btn-ghost" href="#controls">How it works</a>
+      </div>
+    </div>
+  </section>
+  <div class="checker" aria-hidden="true"></div>
+
+  <section class="wrap hud" id="hud" aria-label="Run stats">
+    <div class="stat"><p class="label">Rings</p><p class="value">00</p></div>
+    <div class="stat"><p class="label">Time</p><p class="value">0:00.00</p></div>
+    <div class="stat"><p class="label">Score</p><p class="value">000000</p></div>
+    <div class="stat"><p class="label">Lives</p><p class="value">3</p></div>
+  </section>
+
+  <section class="wrap section" id="zones">
+    <div class="section-head">
+      <p class="eyebrow alt">Zone select</p>
+      <h2 class="head">Pick a track</h2>
+    </div>
+    <div class="zones">
+      <a class="zone" href="#zones">
+        <span class="num">01</span>
+        <p class="name">Cobalt Coast</p>
+        <p class="sub">The tutorial shoreline.</p>
+      </a>
+      <a class="zone" href="#zones">
+        <span class="num">02</span>
+        <p class="name">Sunburst City</p>
+        <p class="sub">Neon canyon run.</p>
+      </a>
+      <a class="zone" href="#zones">
+        <span class="num">03</span>
+        <p class="name">Overdrive Highway</p>
+        <p class="sub">Full-throttle straight.</p>
+      </a>
+      <a class="zone" href="#zones">
+        <span class="num">04</span>
+        <p class="name">Palette Park</p>
+        <p class="sub">A fever-dream finale.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="wrap section" id="controls">
+    <div class="section-head">
+      <p class="eyebrow alt">Controls</p>
+      <h2 class="head">Bindings</h2>
+    </div>
+    <div class="controls" style="margin-top: var(--space-lg);">
+      <div class="key"><span class="k">← →</span><span class="a">Steer</span></div>
+      <div class="key"><span class="k">A / ␣</span><span class="a">Jump</span></div>
+      <div class="key"><span class="k">B</span><span class="a">Boost</span></div>
+      <div class="key"><span class="k">Select</span><span class="a">Pause</span></div>
+    </div>
+  </section>
+
+  <div class="hills" aria-hidden="true">
+    <svg viewBox="0 0 1200 150" preserveAspectRatio="none">
+      <path d="M0,150 L0,95 Q150,25 320,85 Q470,135 620,80 Q780,30 940,90 Q1070,130 1200,70 L1200,150 Z" fill="var(--color-hill-1)"/>
+      <path d="M0,150 L0,130 Q220,70 450,120 Q660,155 860,112 Q1000,85 1200,125 L1200,150 Z" fill="var(--color-hill-2)"/>
+      <rect x="0" y="141" width="1200" height="9" fill="var(--color-hill-3)"/>
+    </svg>
+  </div>
+
+  <footer>
+    <div class="wrap foot">
+      <span class="wordmark">OVER<span class="dot">DRIVE</span></span>
+      <small>A Hallmark theme · 90s arcade DNA · no assets copied</small>
+    </div>
+  </footer>
+</body>
+</html>
