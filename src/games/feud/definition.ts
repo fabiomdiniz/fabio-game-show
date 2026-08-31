@@ -3,16 +3,26 @@ import type {
   FeudConfig,
   FeudRoundState,
   FeudState,
+  FeudTeam,
+  FeudTeamKey,
   GameDefinition,
 } from '../../types'
 import { findFeudQuestion } from '../../content/feud'
 
-function otherTeam(state: FeudState, teamId: string): string {
-  return state.teamAId === teamId ? state.teamBId : state.teamAId
+function otherTeamKey(key: FeudTeamKey): FeudTeamKey {
+  return key === 'A' ? 'B' : 'A'
+}
+
+function teamOf(state: FeudState, key: FeudTeamKey): FeudTeam {
+  return key === 'A' ? state.teamA : state.teamB
+}
+
+function deltasFor(team: FeudTeam, roundTotal: number) {
+  return team.playerIds.map((participantId) => ({ participantId, delta: roundTotal }))
 }
 
 function freshRound(): FeudRoundState {
-  return { phase: 'faceOff', controllingTeamId: null, revealed: [], strikes: 0, roundTotal: 0 }
+  return { phase: 'faceOff', controllingTeam: null, revealed: [], strikes: 0, roundTotal: 0 }
 }
 
 function advanceQuestion(state: FeudState): FeudState {
@@ -26,19 +36,25 @@ function advanceQuestion(state: FeudState): FeudState {
 export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudAction> = {
   kind: 'feud',
   title: 'Fábio-ly Feud',
-  acceptedKinds: ['team'],
-  initialConfig: () => ({ teamAId: '', teamBId: '', questionIds: [] }),
+  acceptedKinds: ['individual'],
+  initialConfig: () => ({
+    teamA: { name: 'Team A', playerIds: [] },
+    teamB: { name: 'Team B', playerIds: [] },
+    questionIds: [],
+  }),
   initialState: (c) => ({
-    teamAId: c.teamAId,
-    teamBId: c.teamBId,
+    teamA: c.teamA,
+    teamB: c.teamB,
     questions: c.questionIds.map((id) => findFeudQuestion(id)!).filter(Boolean),
     questionIndex: 0,
     round: freshRound(),
     finished: false,
   }),
   validateConfig: (c) => {
-    if (c.teamAId === c.teamBId) return 'Teams must be distinct'
-    if (!c.teamAId || !c.teamBId) return 'Two teams are required'
+    if (!c.teamA?.name?.trim() || !c.teamB?.name?.trim()) return 'Team names are required'
+    if (!Array.isArray(c.teamA?.playerIds) || c.teamA.playerIds.length === 0) return 'Team A needs players'
+    if (!Array.isArray(c.teamB?.playerIds) || c.teamB.playerIds.length === 0) return 'Team B needs players'
+    if (c.teamA.playerIds.some((id) => c.teamB.playerIds.includes(id))) return 'Teams must be distinct'
     if (!Array.isArray(c.questionIds) || c.questionIds.length === 0) return 'At least one question is required'
     for (const id of c.questionIds) {
       if (!findFeudQuestion(id)) return `Unknown question id: ${id}`
@@ -53,11 +69,12 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
     switch (a.type) {
       case 'faceOffWinner': {
         if (s.round.phase !== 'faceOff') return { state: s, deltas: [] }
+        if (a.team !== 'A' && a.team !== 'B') return { state: s, deltas: [] }
         const topPoints = q.answers[0]?.points ?? 0
         return {
           state: {
             ...s,
-            round: { phase: 'board', controllingTeamId: a.teamId, revealed: [0], strikes: 0, roundTotal: topPoints },
+            round: { phase: 'board', controllingTeam: a.team, revealed: [0], strikes: 0, roundTotal: topPoints },
           },
           deltas: [],
         }
@@ -71,10 +88,10 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
         const revealed = [...s.round.revealed, a.answerIndex]
         const roundTotal = s.round.roundTotal + answer.points
         if (revealed.length === q.answers.length) {
-          const controlling = s.round.controllingTeamId!
+          const controlling = s.round.controllingTeam!
           return {
             state: advanceQuestion({ ...s, round: { ...s.round, revealed, roundTotal, phase: 'done' } }),
-            deltas: [{ participantId: controlling, delta: roundTotal }],
+            deltas: deltasFor(teamOf(s, controlling), roundTotal),
           }
         }
         return { state: { ...s, round: { ...s.round, revealed, roundTotal } }, deltas: [] }
@@ -89,12 +106,12 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
 
       case 'stealResult': {
         if (s.round.phase !== 'steal') return { state: s, deltas: [] }
-        const controlling = s.round.controllingTeamId!
-        const winner = a.correct ? otherTeam(s, controlling) : controlling
+        const controlling = s.round.controllingTeam!
+        const winner = a.correct ? otherTeamKey(controlling) : controlling
         const revealedAll = q.answers.map((_, i) => i)
         return {
           state: advanceQuestion({ ...s, round: { ...s.round, phase: 'done', revealed: revealedAll } }),
-          deltas: [{ participantId: winner, delta: s.round.roundTotal }],
+          deltas: deltasFor(teamOf(s, winner), s.round.roundTotal),
         }
       }
 

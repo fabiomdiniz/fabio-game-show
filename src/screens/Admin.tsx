@@ -38,7 +38,6 @@ function ParticipantRow({
           Save
         </button>
       </td>
-      <td>{participant.kind}</td>
       <td data-testid={`points-${participant.name}`}>{participant.points}</td>
       <td>
         <input
@@ -106,7 +105,6 @@ export default function Admin() {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Kind</th>
             <th>Points</th>
             <th>Override</th>
             <th></th>
@@ -128,9 +126,6 @@ export default function Admin() {
       <ParticipantForm
         onAddPlayer={(name) =>
           dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'individual' })
-        }
-        onAddTeam={(name, members) =>
-          dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'team', members })
         }
       />
 

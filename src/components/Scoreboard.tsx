@@ -7,7 +7,6 @@ export default function Scoreboard({ participants }: { participants: Participant
       <thead>
         <tr>
           <th>Participant</th>
-          <th>Kind</th>
           <th>Points</th>
         </tr>
       </thead>
@@ -18,7 +17,6 @@ export default function Scoreboard({ participants }: { participants: Participant
               {p.name}
               {p.members && p.members.length > 0 ? ` (${p.members.join(', ')})` : ''}
             </td>
-            <td>{p.kind}</td>
             <td>{p.points}</td>
           </tr>
         ))}

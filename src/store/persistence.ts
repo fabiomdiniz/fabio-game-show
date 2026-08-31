@@ -60,14 +60,23 @@ function validateGame(
     }
     case 'feud': {
       const c = g.config
-      if (c.teamAId === c.teamBId) return 'feud teams must be distinct'
+      const validTeam = (t: unknown): t is { name: string; playerIds: string[] } =>
+        isObj(t) &&
+        typeof t.name === 'string' &&
+        t.name.trim() !== '' &&
+        Array.isArray(t.playerIds) &&
+        t.playerIds.length > 0 &&
+        t.playerIds.every((id) => typeof id === 'string')
+      if (!validTeam(c.teamA) || !validTeam(c.teamB)) return 'feud requires two teams with names and players'
+      if (c.teamA.playerIds.some((id) => c.teamB.playerIds.includes(id))) return 'feud teams must be distinct'
       if (!Array.isArray(c.questionIds) || c.questionIds.length === 0) return 'feud questionIds must be non-empty'
       for (const q of c.questionIds) {
         if (!findFeudQuestion(q)) return `feud question id not found: ${q}`
       }
       if (resolveIds) {
-        if (kinds.get(c.teamAId) !== 'team') return `feud teamAId must be an existing team: ${c.teamAId}`
-        if (kinds.get(c.teamBId) !== 'team') return `feud teamBId must be an existing team: ${c.teamBId}`
+        for (const pid of [...c.teamA.playerIds, ...c.teamB.playerIds]) {
+          if (kinds.get(pid) !== 'individual') return `feud player must be an existing individual: ${pid}`
+        }
       }
       return null
     }

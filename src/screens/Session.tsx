@@ -33,9 +33,6 @@ export default function Session() {
         onAddPlayer={(name) =>
           dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'individual' })
         }
-        onAddTeam={(name, members) =>
-          dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'team', members })
-        }
       />
 
       <h2>Play a game</h2>

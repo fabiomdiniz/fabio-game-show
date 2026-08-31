@@ -98,11 +98,16 @@ export interface FightingState {
 export type FightingAction = { type: 'advance'; matchId: string; winnerId: string }
 
 // ---- Feud ----
+export interface FeudTeam {
+  name: string
+  playerIds: string[]
+}
 export interface FeudConfig {
-  teamAId: string
-  teamBId: string
+  teamA: FeudTeam
+  teamB: FeudTeam
   questionIds: string[]
 }
+export type FeudTeamKey = 'A' | 'B'
 export interface FeudAnswer {
   text: string
   points: number
@@ -120,21 +125,21 @@ export interface FeudCategory {
 export type FeudPhase = 'faceOff' | 'board' | 'steal' | 'done'
 export interface FeudRoundState {
   phase: FeudPhase
-  controllingTeamId: string | null
+  controllingTeam: FeudTeamKey | null
   revealed: number[]
   strikes: number
   roundTotal: number
 }
 export interface FeudState {
-  teamAId: string
-  teamBId: string
+  teamA: FeudTeam
+  teamB: FeudTeam
   questions: FeudQuestion[]
   questionIndex: number
   round: FeudRoundState
   finished: boolean
 }
 export type FeudAction =
-  | { type: 'faceOffWinner'; teamId: string }
+  | { type: 'faceOffWinner'; team: FeudTeamKey }
   | { type: 'reveal'; answerIndex: number }
   | { type: 'strike' }
   | { type: 'stealResult'; correct: boolean }

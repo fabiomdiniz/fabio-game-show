@@ -38,23 +38,18 @@ describe('Session', () => {
     renderSession(sid)
 
     expect(screen.getByText('Ana')).toBeInTheDocument()
-    expect(screen.getByText('individual')).toBeInTheDocument()
 
     fireEvent.change(screen.getByLabelText('Participant name'), { target: { value: 'Bruno' } })
     fireEvent.click(screen.getByText('Add'))
     expect(screen.getByText('Bruno')).toBeInTheDocument()
   })
 
-  it('adds a team with members', () => {
+  it('does not offer adding teams', () => {
     const { s, sid } = seed()
     saveState(s)
     renderSession(sid)
 
-    fireEvent.change(screen.getByLabelText('Participant name'), { target: { value: 'Team Red' } })
-    fireEvent.change(screen.getByLabelText('Kind'), { target: { value: 'team' } })
-    fireEvent.change(screen.getByLabelText('Members'), { target: { value: 'Ana, Bruno' } })
-    fireEvent.click(screen.getByText('Add'))
-    expect(screen.getByText(/Team Red/)).toBeInTheDocument()
-    expect(screen.getByText(/Ana, Bruno/)).toBeInTheDocument()
+    expect(screen.queryByLabelText('Kind')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Members')).not.toBeInTheDocument()
   })
 })

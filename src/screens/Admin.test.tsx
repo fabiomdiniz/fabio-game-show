@@ -55,6 +55,13 @@ describe('Admin', () => {
     expect(screen.getByLabelText('rename-Bruno')).toBeInTheDocument()
   })
 
+  it('does not show a Kind column', () => {
+    saveState(seed())
+    renderAdmin()
+    expect(screen.queryByText('Kind')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Kind')).not.toBeInTheDocument()
+  })
+
   it('shows an import error for invalid state', async () => {
     saveState(seed())
     renderAdmin()

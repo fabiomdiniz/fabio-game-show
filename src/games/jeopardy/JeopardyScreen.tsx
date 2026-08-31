@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/StoreContext'
 import { jeopardyBoard } from '../../content/jeopardy'
+import PointSummary from '../../components/PointSummary'
 
 export default function JeopardyScreen() {
   const { id: sessionId } = useParams()
-  const { state, beginGame, act } = useStore()
+  const navigate = useNavigate()
+  const { state, beginGame, act, abandonGame } = useStore()
   const session = state.sessions.find((s) => s.id === sessionId)
 
   const [participantIds, setParticipantIds] = useState<string[]>([])
@@ -13,11 +15,25 @@ export default function JeopardyScreen() {
   const [activeClueId, setActiveClueId] = useState<string | null>(null)
   const [responderId, setResponderId] = useState('')
   const [wager, setWager] = useState('0')
+  const [dismissFinished, setDismissFinished] = useState(false)
+
+  const activeGame = session?.games.find((g) => g.kind === 'jeopardy' && g.status !== 'finished')
+
+  useEffect(() => {
+    if (activeGame) setDismissFinished(false)
+  }, [activeGame?.id])
 
   if (!session) return <p style={{ padding: 16 }}>Session not found.</p>
 
-  const rawGame = session.games.find((g) => g.kind === 'jeopardy' && g.status !== 'finished')
-  const game = rawGame?.kind === 'jeopardy' ? rawGame : undefined
+  const lastFinishedGame = [...session.games]
+    .reverse()
+    .find((g) => g.kind === 'jeopardy' && g.status === 'finished')
+  const game =
+    activeGame?.kind === 'jeopardy'
+      ? activeGame
+      : !dismissFinished && lastFinishedGame?.kind === 'jeopardy'
+        ? lastFinishedGame
+        : undefined
 
   const nameOf = (id: string) => session.participants.find((p) => p.id === id)?.name ?? id
 
@@ -60,6 +76,10 @@ export default function JeopardyScreen() {
     if (game.state.phase === 'board') {
       return (
         <div style={{ padding: 16 }}>
+          <p>
+            <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
+            <button onClick={() => abandonGame(game.id)}>Abandon game</button>
+          </p>
           <h1>What is… Panda?</h1>
           {activeClue && (
             <div>
@@ -153,6 +173,10 @@ export default function JeopardyScreen() {
       const eligible = game.config.participantIds.filter((pid) => (game.state.scores[pid] ?? 0) > 0)
       return (
         <div style={{ padding: 16 }}>
+          <p>
+            <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
+            <button onClick={() => abandonGame(game.id)}>Abandon game</button>
+          </p>
           <h1>Final Jeopardy</h1>
           <p>
             <strong>{game.state.finalJeopardy.category}:</strong> {game.state.finalJeopardy.clue}
@@ -188,8 +212,11 @@ export default function JeopardyScreen() {
   return (
     <div style={{ padding: 16 }}>
       <h1>What is… Panda? — done</h1>
+      <h2>Points earned</h2>
+      <PointSummary awards={game.result?.awards ?? []} />
       <p>
-        <Link to={`/session/${sessionId}`}>Back to session</Link>
+        <Link to={`/session/${sessionId}`}>Back to main screen</Link>{' '}
+        <button onClick={() => setDismissFinished(true)}>Start a new game</button>
       </p>
     </div>
   )

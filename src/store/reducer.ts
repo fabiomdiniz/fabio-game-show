@@ -18,7 +18,7 @@ export function referencedParticipantIds(instance: GameInstance): string[] {
     case 'fighting':
       return [...instance.config.entrants]
     case 'feud':
-      return [instance.config.teamAId, instance.config.teamBId]
+      return [...instance.config.teamA.playerIds, ...instance.config.teamB.playerIds]
     case 'jeopardy':
       return [...instance.config.participantIds]
   }

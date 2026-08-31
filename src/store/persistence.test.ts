@@ -84,7 +84,7 @@ describe('persistence', () => {
 
     expect(
       validateState(
-        mk({ id: 'c', kind: 'feud', status: 'inProgress', config: { teamAId: 't', teamBId: 't', questionIds: [] }, state: { teamAId: 't', teamBId: 't', questions: [], questionIndex: 0, round: { phase: 'faceOff', controllingTeamId: null, revealed: [], strikes: 0, roundTotal: 0 }, finished: false }, initialPoints: {}, appliedDeltas: [] }),
+        mk({ id: 'c', kind: 'feud', status: 'inProgress', config: { teamA: { name: 'A', playerIds: ['p1'] }, teamB: { name: 'B', playerIds: ['p1'] }, questionIds: [] }, state: { teamA: { name: 'A', playerIds: ['p1'] }, teamB: { name: 'B', playerIds: ['p1'] }, questions: [], questionIndex: 0, round: { phase: 'faceOff', controllingTeam: null, revealed: [], strikes: 0, roundTotal: 0 }, finished: false }, initialPoints: {}, appliedDeltas: [] }),
       ),
     ).toMatch(/distinct/)
   })
