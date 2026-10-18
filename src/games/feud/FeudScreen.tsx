@@ -22,7 +22,7 @@ export default function FeudScreen() {
     if (activeGame) setDismissFinished(false)
   }, [activeGame?.id])
 
-  if (!session) return <p style={{ padding: 16 }}>Session not found.</p>
+  if (!session) return <p className="page">Session not found.</p>
 
   const lastFinishedGame = [...session.games]
     .reverse()
@@ -54,7 +54,7 @@ export default function FeudScreen() {
       questionIds.length > 0
 
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>Fábio-ly Feud</h1>
         <div style={{ display: 'flex', gap: 16 }}>
           <label>
@@ -149,7 +149,7 @@ export default function FeudScreen() {
           : null
 
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>Fábio-ly Feud</h1>
         <p>
           Question {game.state.questionIndex + 1} of {game.state.questions.length}: {q.question}
@@ -200,7 +200,7 @@ export default function FeudScreen() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>Fábio-ly Feud — done</h1>
       <h2>Points earned</h2>
       <PointSummary awards={game.result?.awards ?? []} />

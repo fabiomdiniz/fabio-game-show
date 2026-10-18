@@ -23,7 +23,7 @@ export default function JeopardyScreen() {
     if (activeGame) setDismissFinished(false)
   }, [activeGame?.id])
 
-  if (!session) return <p style={{ padding: 16 }}>Session not found.</p>
+  if (!session) return <p className="page">Session not found.</p>
 
   const lastFinishedGame = [...session.games]
     .reverse()
@@ -43,7 +43,7 @@ export default function JeopardyScreen() {
     const toggleC = (cid: string) =>
       setCategoryIds((ids) => (ids.includes(cid) ? ids.filter((x) => x !== cid) : [...ids, cid]))
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>What is… Panda?</h1>
         <p>Participants:</p>
         {session.participants.map((p) => (
@@ -75,7 +75,7 @@ export default function JeopardyScreen() {
 
     if (game.state.phase === 'board') {
       return (
-        <div style={{ padding: 16 }}>
+        <div className="page">
           <p>
             <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
             <button onClick={() => abandonGame(game.id)}>Abandon game</button>
@@ -172,7 +172,7 @@ export default function JeopardyScreen() {
     if (game.state.phase === 'finalJeopardy') {
       const eligible = game.config.participantIds.filter((pid) => (game.state.scores[pid] ?? 0) > 0)
       return (
-        <div style={{ padding: 16 }}>
+        <div className="page">
           <p>
             <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
             <button onClick={() => abandonGame(game.id)}>Abandon game</button>
@@ -210,7 +210,7 @@ export default function JeopardyScreen() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>What is… Panda? — done</h1>
       <h2>Points earned</h2>
       <PointSummary awards={game.result?.awards ?? []} />

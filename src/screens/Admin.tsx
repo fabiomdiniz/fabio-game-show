@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useStore } from '../store/StoreContext'
 import { exportState, importFile } from '../store/persistence'
 import { referencedParticipantIds } from '../store/reducer'
@@ -76,16 +76,17 @@ function ParticipantRow({
 }
 
 export default function Admin() {
+  const { id } = useParams()
   const { state, dispatch } = useStore()
-  const session = state.sessions.find((s) => s.id === state.activeSessionId)
+  const session = state.sessions.find((s) => s.id === id)
   const fileRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
 
   if (!session) {
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>Admin</h1>
-        <p>No active session.</p>
+        <p>Session not found.</p>
         <Link to="/">← Sessions</Link>
       </div>
     )
@@ -96,7 +97,7 @@ export default function Admin() {
   )
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>Admin — {session.name}</h1>
       <Link to={`/session/${session.id}`}>← Session</Link>
 

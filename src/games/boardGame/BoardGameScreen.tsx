@@ -11,14 +11,14 @@ export default function BoardGameScreen() {
   const [pointValue, setPointValue] = useState('1')
   const [winners, setWinners] = useState<string[]>([])
 
-  if (!session) return <p style={{ padding: 16 }}>Session not found.</p>
+  if (!session) return <p className="page">Session not found.</p>
 
   const rawGame = session.games.find((g) => g.kind === 'boardGame' && g.status !== 'finished')
   const game = rawGame?.kind === 'boardGame' ? rawGame : undefined
 
   if (!game) {
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>Board Game</h1>
         <label>
           Name{' '}
@@ -53,7 +53,7 @@ export default function BoardGameScreen() {
     const toggle = (pid: string) =>
       setWinners((ws) => (ws.includes(pid) ? ws.filter((x) => x !== pid) : [...ws, pid]))
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>{game.config.name} is being played…</h1>
         <h2>Select winners</h2>
         {session.participants.map((p) => (
@@ -80,7 +80,7 @@ export default function BoardGameScreen() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>{game.config.name} — done</h1>
       <p>
         <Link to={`/session/${sessionId}`}>Back to session</Link>

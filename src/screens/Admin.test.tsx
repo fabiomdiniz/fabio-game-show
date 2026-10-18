@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import Admin from './Admin'
 import { StoreProvider } from '../store/StoreContext'
 import { saveState } from '../store/persistence'
@@ -13,14 +13,16 @@ function seed() {
   const sid = s.activeSessionId!
   s = reducer(s, { type: 'addParticipant', sessionId: sid, name: 'Ana', kind: 'individual' })
   s = reducer(s, { type: 'overridePoints', sessionId: sid, participantId: s.sessions[0].participants[0].id, points: 10 })
-  return s
+  return { s, sid }
 }
 
-function renderAdmin() {
+function renderAdmin(sid: string) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[`/session/${sid}/admin`]}>
       <StoreProvider>
-        <Admin />
+        <Routes>
+          <Route path="/session/:id/admin" element={<Admin />} />
+        </Routes>
       </StoreProvider>
     </MemoryRouter>,
   )
@@ -32,39 +34,44 @@ beforeEach(() => {
 
 describe('Admin', () => {
   it('renames a participant', () => {
-    saveState(seed())
-    renderAdmin()
+    const { s, sid } = seed()
+    saveState(s)
+    renderAdmin(sid)
     fireEvent.change(screen.getByLabelText('rename-Ana'), { target: { value: 'Ana B.' } })
     fireEvent.click(screen.getByText('Save'))
     expect(screen.getByLabelText('rename-Ana B.')).toBeInTheDocument()
   })
 
   it('overrides points', () => {
-    saveState(seed())
-    renderAdmin()
+    const { s, sid } = seed()
+    saveState(s)
+    renderAdmin(sid)
     fireEvent.change(screen.getByLabelText('override-Ana'), { target: { value: '50' } })
     fireEvent.click(screen.getByText('Set'))
     expect(screen.getByTestId('points-Ana').textContent).toBe('50')
   })
 
   it('adds a participant', () => {
-    saveState(seed())
-    renderAdmin()
+    const { s, sid } = seed()
+    saveState(s)
+    renderAdmin(sid)
     fireEvent.change(screen.getByLabelText('Participant name'), { target: { value: 'Bruno' } })
     fireEvent.click(screen.getByText('Add'))
     expect(screen.getByLabelText('rename-Bruno')).toBeInTheDocument()
   })
 
   it('does not show a Kind column', () => {
-    saveState(seed())
-    renderAdmin()
+    const { s, sid } = seed()
+    saveState(s)
+    renderAdmin(sid)
     expect(screen.queryByText('Kind')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Kind')).not.toBeInTheDocument()
   })
 
   it('shows an import error for invalid state', async () => {
-    saveState(seed())
-    renderAdmin()
+    const { s, sid } = seed()
+    saveState(s)
+    renderAdmin(sid)
     const file = new File(['{"version": 99}'], 'state.json', { type: 'application/json' })
     const fileInput = document.querySelector('input[type=file]') as HTMLInputElement
     fireEvent.change(fileInput, { target: { files: [file] } })

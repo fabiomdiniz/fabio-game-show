@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { StoreProvider } from './store/StoreContext'
 import './games/register'
 import Sessions from './screens/Sessions'
@@ -10,12 +10,29 @@ export default function App() {
   return (
     <StoreProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Sessions />} />
-          <Route path="/session/:id" element={<Session />} />
-          <Route path="/session/:id/game/:kind" element={<GameScreen />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
+        <div className="app-shell">
+          <header className="topbar wrap">
+            <span className="wordmark">
+              FÁBIO<span className="dot">·</span>GAME SHOW
+            </span>
+            <nav className="topnav" aria-label="Primary">
+              <Link to="/">Sessions</Link>
+            </nav>
+          </header>
+          <div className="checker" aria-hidden="true"></div>
+          <main>
+            <Routes>
+              <Route path="/" element={<Sessions />} />
+              <Route path="/session/:id" element={<Session />} />
+              <Route path="/session/:id/game/:kind" element={<GameScreen />} />
+              <Route path="/session/:id/admin" element={<Admin />} />
+            </Routes>
+          </main>
+          <footer className="site-footer">
+            <span>Fábio Game Show</span>
+            <small>Overdrive theme · structural DNA only</small>
+          </footer>
+        </div>
       </BrowserRouter>
     </StoreProvider>
   )

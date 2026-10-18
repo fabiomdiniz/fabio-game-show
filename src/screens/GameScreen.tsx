@@ -16,6 +16,6 @@ export default function GameScreen() {
     case 'jeopardy':
       return <JeopardyScreen />
     default:
-      return <p style={{ padding: 16 }}>Coming soon</p>
+      return <p className="page">Coming soon</p>
   }
 }

@@ -14,7 +14,7 @@ export default function Sessions() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>Sessions</h1>
       <form
         onSubmit={(e) => {

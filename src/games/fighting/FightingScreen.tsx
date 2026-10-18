@@ -11,7 +11,7 @@ export default function FightingScreen() {
   const [secondPlace, setSecondPlace] = useState('5')
   const [entrants, setEntrants] = useState<string[]>([])
 
-  if (!session) return <p style={{ padding: 16 }}>Session not found.</p>
+  if (!session) return <p className="page">Session not found.</p>
 
   const rawGame = session.games.find((g) => g.kind === 'fighting' && g.status !== 'finished')
   const game = rawGame?.kind === 'fighting' ? rawGame : undefined
@@ -23,7 +23,7 @@ export default function FightingScreen() {
     const toggle = (pid: string) =>
       setEntrants((es) => (es.includes(pid) ? es.filter((x) => x !== pid) : [...es, pid]))
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>Fighting Game</h1>
         <p>Select fighters (individual players only):</p>
         {individuals.map((p) => (
@@ -66,7 +66,7 @@ export default function FightingScreen() {
       if (matchId === finalMatchId) finishGame(game.id)
     }
     return (
-      <div style={{ padding: 16 }}>
+      <div className="page">
         <h1>Fighting Game</h1>
         {game.state.rounds.map((round, ri) => (
           <div key={ri}>
@@ -99,7 +99,7 @@ export default function FightingScreen() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>Fighting Game — done</h1>
       <p>
         <Link to={`/session/${sessionId}`}>Back to session</Link>

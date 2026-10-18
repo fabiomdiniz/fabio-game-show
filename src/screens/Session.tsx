@@ -16,17 +16,16 @@ export default function Session() {
   const { state, dispatch } = useStore()
   const session = state.sessions.find((s) => s.id === id)
 
-  if (!session) return <p style={{ padding: 16 }}>Session not found.</p>
+  if (!session) return <p className="page">Session not found.</p>
 
   const inProgress = session.games.some((g) => g.status === 'inProgress')
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="page">
       <h1>{session.name}</h1>
-      <Link to="/">← Sessions</Link> <Link to="/admin">Admin</Link>
+      <Link to="/">← Sessions</Link> <Link to={`/session/${session.id}/admin`}>Admin</Link>
 
-      <h2>Scoreboard</h2>
-      <Scoreboard participants={session.participants} />
+      <Scoreboard participants={session.participants} title={session.name} />
 
       <h2>Add participant</h2>
       <ParticipantForm
@@ -35,17 +34,20 @@ export default function Session() {
         }
       />
 
-      <h2>Play a game</h2>
+      <h2 className="menu-title">Main Menu</h2>
       {inProgress && <p>A game is already in progress.</p>}
-      <ul>
-        {CATALOG.map((g) => (
-          <li key={g.kind}>
-            <Link to={`/session/${session.id}/game/${g.kind}`} aria-disabled={inProgress}>
-              {g.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div className="menu-body">
+        <div className="menu-preview" aria-hidden="true"></div>
+        <ol className="menu-list">
+          {CATALOG.map((g) => (
+            <li key={g.kind} className={`menu-item${inProgress ? ' disabled' : ''}`}>
+              <Link to={`/session/${session.id}/game/${g.kind}`} aria-disabled={inProgress}>
+                {g.title}
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
   )
 }
