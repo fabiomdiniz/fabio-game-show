@@ -22,9 +22,11 @@ export default function Sessions() {
     const res = await importSessionFile(file)
     if (res.error) {
       setImportError(res.error)
-    } else if (res.session) {
+    } else if (res.sessions && res.sessions.length > 0) {
       setImportError(null)
-      dispatch({ type: 'importSession', session: res.session })
+      for (const session of res.sessions) {
+        dispatch({ type: 'importSession', session })
+      }
     }
     e.target.value = ''
   }
