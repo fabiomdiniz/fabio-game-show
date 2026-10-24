@@ -104,4 +104,11 @@ describe('feud definition', () => {
     expect(r.state.round.winner).toBe('A')
     expect(r.state.finished).toBe(false)
   })
+
+  it('endGame finishes immediately without extra deltas', () => {
+    const s = start()
+    const r = def.applyAction(s, { type: 'endGame' })
+    expect(r.state.finished).toBe(true)
+    expect(r.deltas).toEqual([])
+  })
 })
