@@ -30,7 +30,6 @@ export default function App() {
           </main>
           <footer className="site-footer">
             <span>Fábio Game Show</span>
-            <small>Overdrive theme · structural DNA only</small>
           </footer>
         </div>
       </BrowserRouter>
