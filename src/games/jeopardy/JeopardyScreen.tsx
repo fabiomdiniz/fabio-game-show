@@ -49,6 +49,14 @@ export default function JeopardyScreen() {
           <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
         </div>
         <h2>Participants</h2>
+        <div className="btn-row">
+          <button type="button" onClick={() => setParticipantIds(session.participants.map((p) => p.id))}>
+            Select all
+          </button>
+          <button type="button" onClick={() => setParticipantIds([])}>
+            Clear
+          </button>
+        </div>
         <div className="check-list">
           {session.participants.map((p) => (
             <label key={p.id} className="check-row">
@@ -58,6 +66,14 @@ export default function JeopardyScreen() {
           ))}
         </div>
         <h2>Categories</h2>
+        <div className="btn-row">
+          <button type="button" onClick={() => setCategoryIds(jeopardyBoard.categories.map((c) => c.id))}>
+            Select all
+          </button>
+          <button type="button" onClick={() => setCategoryIds([])}>
+            Clear
+          </button>
+        </div>
         <div className="check-list">
           {jeopardyBoard.categories.map((c) => (
             <label key={c.id} className="check-row">
