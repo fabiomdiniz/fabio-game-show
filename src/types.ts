@@ -140,7 +140,7 @@ export type FeudAction =
   | { type: 'faceOffWinner'; team: FeudTeamKey }
   | { type: 'reveal'; answerIndex: number }
   | { type: 'strike' }
-  | { type: 'stealResult'; correct: boolean }
+  | { type: 'stealResult'; correct: boolean; answerIndex?: number }
   | { type: 'nextQuestion' }
   | { type: 'endGame' }
 

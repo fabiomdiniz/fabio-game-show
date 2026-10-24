@@ -121,10 +121,14 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
         if (s.round.phase !== 'steal') return { state: s, deltas: [] }
         const controlling = s.round.controllingTeam!
         const winner = a.correct ? otherTeamKey(controlling) : controlling
+        // A successful steal reveals one more answer; fold its points into the round.
+        const stolenPoints =
+          a.correct && a.answerIndex != null ? (q.answers[a.answerIndex]?.points ?? 0) : 0
+        const roundTotal = s.round.roundTotal + stolenPoints
         const revealedAll = q.answers.map((_, i) => i)
         return {
-          state: { ...s, round: { ...s.round, phase: 'done', revealed: revealedAll, winner } },
-          deltas: deltasFor(teamOf(s, winner), s.round.roundTotal),
+          state: { ...s, round: { ...s.round, phase: 'done', revealed: revealedAll, winner, roundTotal } },
+          deltas: deltasFor(teamOf(s, winner), roundTotal),
         }
       }
 

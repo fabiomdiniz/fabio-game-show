@@ -55,18 +55,20 @@ describe('feud definition', () => {
     expect(r.state.round.roundTotal).toBe(q.answers[0].points)
   })
 
-  it('a correct steal credits every player on the stealing team', () => {
+  it('a correct steal credits the stealing team, including the stolen answer', () => {
     let s = start()
     s = def.applyAction(s, { type: 'faceOffWinner', team: 'A' }).state
-    s = def.applyAction(s, { type: 'reveal', answerIndex: 1 }).state
+    s = def.applyAction(s, { type: 'reveal', answerIndex: 1 }).state // Psyduck: 45
     s = def.applyAction(s, { type: 'strike' }).state
     s = def.applyAction(s, { type: 'strike' }).state
     s = def.applyAction(s, { type: 'strike' }).state
     expect(s.round.phase).toBe('steal')
-    const r = def.applyAction(s, { type: 'stealResult', correct: true })
+    // Team B steals Wartortle (50) -> round total 45 + 50 = 95
+    const r = def.applyAction(s, { type: 'stealResult', correct: true, answerIndex: 0 })
     expect(r.deltas).toEqual(
-      config.teamB.playerIds.map((participantId) => ({ participantId, delta: s.round.roundTotal })),
+      config.teamB.playerIds.map((participantId) => ({ participantId, delta: 95 })),
     )
+    expect(r.state.round.roundTotal).toBe(95)
     expect(r.state.round.phase).toBe('done')
     expect(r.state.round.winner).toBe('B')
     expect(r.state.finished).toBe(false)

@@ -218,7 +218,7 @@ export default function FeudScreen() {
       if (round.phase === 'steal') {
         // Steal: correct only if the typed answer is an unrevealed board answer.
         const stolen = idx >= 0 && !round.revealed.includes(idx)
-        act(game.id, { type: 'stealResult', correct: stolen })
+        act(game.id, { type: 'stealResult', correct: stolen, answerIndex: idx >= 0 ? idx : undefined })
       } else if (idx >= 0 && !round.revealed.includes(idx)) {
         // face-off / board: reveal the matching answer, or flag a miss.
         act(game.id, { type: 'reveal', answerIndex: idx })
