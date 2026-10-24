@@ -1,4 +1,4 @@
-import type { AppState, GameInstance, ParticipantKind } from '../types'
+import type { AppState, GameInstance, ParticipantKind, Session } from '../types'
 import { CURRENT_VERSION } from '../types'
 import { emptyState } from './state'
 import { referencedParticipantIds } from './reducer'
@@ -100,6 +100,51 @@ function validateGame(
   }
 }
 
+export function validateSession(value: unknown): string | null {
+  if (!isObj(value)) return 'session must be an object'
+  if (typeof value.id !== 'string' || value.id.trim() === '') return 'session id must be non-empty'
+  if (typeof value.name !== 'string' || value.name.trim() === '') return 'session name must be non-empty'
+  if (!Array.isArray(value.participants)) return 'participants must be an array'
+
+  const kinds = new Map<string, ParticipantKind>()
+  for (const p of value.participants as unknown[]) {
+    if (!isObj(p)) return 'participant must be an object'
+    if (typeof p.id !== 'string' || p.id.trim() === '') return 'participant id must be non-empty'
+    if (kinds.has(p.id)) return `duplicate participant id: ${p.id}`
+    if (typeof p.name !== 'string' || p.name.trim() === '') return 'participant name must be non-empty'
+    if (p.kind !== 'individual' && p.kind !== 'team') return 'invalid participant kind'
+    if (typeof p.points !== 'number' || !Number.isFinite(p.points)) return 'participant points must be a finite number'
+    kinds.set(p.id, p.kind as ParticipantKind)
+  }
+
+  if (!Array.isArray(value.games)) return 'games must be an array'
+  const gameIds = new Set<string>()
+  for (const g of value.games as unknown[]) {
+    if (!isObj(g)) return 'game must be an object'
+    if (typeof g.id !== 'string' || g.id.trim() === '') return 'game id must be non-empty'
+    if (gameIds.has(g.id)) return `duplicate game id: ${g.id}`
+    gameIds.add(g.id)
+    if (g.status !== 'setup' && g.status !== 'inProgress' && g.status !== 'finished') return 'invalid game status'
+    if (!Array.isArray(g.appliedDeltas)) return 'game appliedDeltas must be an array'
+
+    const resolveIds = g.status !== 'finished'
+    const game = g as unknown as GameInstance
+    const err = validateGame(game, kinds, resolveIds)
+    if (err) return err
+
+    if (resolveIds) {
+      for (const pid of referencedParticipantIds(game)) {
+        if (!kinds.has(pid)) return `game references missing participant: ${pid}`
+      }
+      for (const d of game.appliedDeltas) {
+        if (!kinds.has(d.participantId)) return `game delta references missing participant: ${d.participantId}`
+      }
+    }
+  }
+
+  return null
+}
+
 export function validateState(value: unknown): string | null {
   try {
     if (!isObj(value)) return 'state is not an object'
@@ -108,48 +153,11 @@ export function validateState(value: unknown): string | null {
 
     const sessionIds = new Set<string>()
     for (const s of value.sessions as unknown[]) {
-      if (!isObj(s)) return 'session must be an object'
-      if (typeof s.id !== 'string' || s.id.trim() === '') return 'session id must be non-empty'
-      if (sessionIds.has(s.id)) return `duplicate session id: ${s.id}`
-      sessionIds.add(s.id)
-      if (typeof s.name !== 'string' || s.name.trim() === '') return 'session name must be non-empty'
-      if (!Array.isArray(s.participants)) return 'participants must be an array'
-
-      const kinds = new Map<string, ParticipantKind>()
-      for (const p of s.participants as unknown[]) {
-        if (!isObj(p)) return 'participant must be an object'
-        if (typeof p.id !== 'string' || p.id.trim() === '') return 'participant id must be non-empty'
-        if (kinds.has(p.id)) return `duplicate participant id: ${p.id}`
-        if (typeof p.name !== 'string' || p.name.trim() === '') return 'participant name must be non-empty'
-        if (p.kind !== 'individual' && p.kind !== 'team') return 'invalid participant kind'
-        if (typeof p.points !== 'number' || !Number.isFinite(p.points)) return 'participant points must be a finite number'
-        kinds.set(p.id, p.kind as ParticipantKind)
-      }
-
-      if (!Array.isArray(s.games)) return 'games must be an array'
-      const gameIds = new Set<string>()
-      for (const g of s.games as unknown[]) {
-        if (!isObj(g)) return 'game must be an object'
-        if (typeof g.id !== 'string' || g.id.trim() === '') return 'game id must be non-empty'
-        if (gameIds.has(g.id)) return `duplicate game id: ${g.id}`
-        gameIds.add(g.id)
-        if (g.status !== 'setup' && g.status !== 'inProgress' && g.status !== 'finished') return 'invalid game status'
-        if (!Array.isArray(g.appliedDeltas)) return 'game appliedDeltas must be an array'
-
-        const resolveIds = g.status !== 'finished'
-        const game = g as unknown as GameInstance
-        const err = validateGame(game, kinds, resolveIds)
-        if (err) return err
-
-        if (resolveIds) {
-          for (const pid of referencedParticipantIds(game)) {
-            if (!kinds.has(pid)) return `game references missing participant: ${pid}`
-          }
-          for (const d of game.appliedDeltas) {
-            if (!kinds.has(d.participantId)) return `game delta references missing participant: ${d.participantId}`
-          }
-        }
-      }
+      const err = validateSession(s)
+      if (err) return err
+      const sid = (s as { id: string }).id
+      if (sessionIds.has(sid)) return `duplicate session id: ${sid}`
+      sessionIds.add(sid)
     }
 
     const active = value.activeSessionId
@@ -206,14 +214,35 @@ export function exportState(state: AppState): void {
   URL.revokeObjectURL(url)
 }
 
+function readFileText(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsText(file)
+  })
+}
+
 export async function importFile(file: File): Promise<{ state: AppState | null; error: string | null }> {
   try {
-    const text = await file.text()
+    const text = await readFileText(file)
     const value: unknown = JSON.parse(text)
     const err = validateState(value)
     if (err) return { state: null, error: err }
     return { state: value as AppState, error: null }
   } catch {
     return { state: null, error: 'Could not read file' }
+  }
+}
+
+export async function importSessionFile(file: File): Promise<{ session: Session | null; error: string | null }> {
+  try {
+    const text = await readFileText(file)
+    const value: unknown = JSON.parse(text)
+    const err = validateSession(value)
+    if (err) return { session: null, error: err }
+    return { session: value as Session, error: null }
+  } catch {
+    return { session: null, error: 'Could not read file' }
   }
 }

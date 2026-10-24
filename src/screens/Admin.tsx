@@ -87,7 +87,7 @@ export default function Admin() {
       <div className="page">
         <h1>Admin</h1>
         <p>Session not found.</p>
-        <Link to="/">← Sessions</Link>
+        <Link className="btn-link" to="/">← Sessions</Link>
       </div>
     )
   }
@@ -99,7 +99,7 @@ export default function Admin() {
   return (
     <div className="page">
       <h1>Admin — {session.name}</h1>
-      <Link to={`/session/${session.id}`}>← Session</Link>
+      <Link className="btn-link" to={`/session/${session.id}`}>← Session</Link>
 
       <h2>Participants</h2>
       <table>

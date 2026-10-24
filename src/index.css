@@ -38,7 +38,8 @@ a:hover {
   color: var(--color-accent);
 }
 
-button {
+button,
+.btn-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -56,6 +57,7 @@ button {
   cursor: pointer;
   box-shadow: inset 0 -3px 0 color-mix(in oklch, var(--color-ink) 25%, transparent);
   white-space: nowrap;
+  text-decoration: none;
   transition:
     filter var(--dur-fast) var(--ease-out),
     transform var(--dur-fast) var(--ease-out),
@@ -64,11 +66,14 @@ button {
     color var(--dur-fast) var(--ease-out);
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+.btn-link:hover {
   filter: brightness(1.06);
+  color: var(--color-accent-ink);
 }
 
-button:active:not(:disabled) {
+button:active:not(:disabled),
+.btn-link:active {
   transform: translateY(1px);
 }
 
@@ -77,7 +82,8 @@ button:disabled {
   cursor: not-allowed;
 }
 
-button:focus-visible {
+button:focus-visible,
+.btn-link:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
@@ -178,6 +184,53 @@ h3 {
   color: var(--color-accent);
 }
 
+.wordmark a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.wordmark a:hover {
+  color: inherit;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: var(--space-sm) var(--space-xs);
+  font-family: var(--font-outlier);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crumbs a {
+  text-decoration: none;
+  color: var(--color-ink-2);
+}
+
+.crumbs a:hover {
+  color: var(--color-accent);
+}
+
+.crumb-sep {
+  color: var(--color-muted);
+  opacity: 0.55;
+}
+
+.crumb-current {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
 .topnav {
   display: flex;
   gap: var(--space-lg);
@@ -200,6 +253,31 @@ h3 {
 .checker {
   height: 12px;
   background: repeating-conic-gradient(var(--color-paper-3) 0% 25%, var(--color-paper-2) 0% 50%) 0 0 / 24px 24px;
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ---- corner mascot (decorative, random per page load, sits behind content) ---- */
+.corner-mascot {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  width: clamp(160px, 24vw, 300px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.9;
+  -webkit-user-drag: none;
+}
+
+@media (max-width: 768px) {
+  .corner-mascot {
+    width: clamp(120px, 34vw, 200px);
+  }
 }
 
 .site-footer {

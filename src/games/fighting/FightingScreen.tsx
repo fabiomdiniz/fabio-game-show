@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/StoreContext'
 import PointSummary from '../../components/PointSummary'
 import { championOf } from './bracket'
@@ -7,6 +7,7 @@ import Bracket from './BracketTree'
 
 export default function FightingScreen() {
   const { id: sessionId } = useParams()
+  const navigate = useNavigate()
   const { state, beginGame, act } = useStore()
   const session = state.sessions.find((s) => s.id === sessionId)
 
@@ -80,7 +81,7 @@ export default function FightingScreen() {
           Start
         </button>
         <p>
-          <Link to={`/session/${sessionId}`}>Back</Link>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
         </p>
       </div>
     )
@@ -100,7 +101,7 @@ export default function FightingScreen() {
         <p className="muted-hint">Tap a fighter to advance them — or tap a winner again to undo it.</p>
         <Bracket rounds={game.state.rounds} nameOf={nameOf} onPick={win} onUndo={undo} />
         <p>
-          <Link to={`/session/${sessionId}`}>Back</Link>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
         </p>
       </div>
     )
@@ -133,7 +134,7 @@ export default function FightingScreen() {
       <Bracket rounds={game.state.rounds} nameOf={displayName} />
 
       <p>
-        <Link to={`/session/${sessionId}`}>Back to main screen</Link>{' '}
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
       </p>
     </div>

@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { StoreProvider } from './store/StoreContext'
 import './games/register'
+import Breadcrumbs from './components/Breadcrumbs'
+import CornerMascot from './components/CornerMascot'
 import Sessions from './screens/Sessions'
 import Session from './screens/Session'
 import GameScreen from './screens/GameScreen'
@@ -11,9 +13,12 @@ export default function App() {
     <StoreProvider>
       <BrowserRouter>
         <div className="app-shell">
+          <CornerMascot />
           <header className="topbar wrap">
             <span className="wordmark">
-              FÁBIO<span className="dot">·</span>GAME SHOW
+              <Link to="/">
+                FÁBIO<span className="dot">·</span>GAME SHOW
+              </Link>
             </span>
             <nav className="topnav" aria-label="Primary">
               <Link to="/">Sessions</Link>
@@ -21,6 +26,7 @@ export default function App() {
           </header>
           <div className="checker" aria-hidden="true"></div>
           <main>
+            <Breadcrumbs />
             <Routes>
               <Route path="/" element={<Sessions />} />
               <Route path="/session/:id" element={<Session />} />

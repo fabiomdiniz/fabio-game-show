@@ -1,4 +1,4 @@
-import type { AppState, GameInstance, ParticipantKind, PointDelta } from '../types'
+import type { AppState, GameInstance, ParticipantKind, PointDelta, Session } from '../types'
 
 export type StoreAction =
   | { type: 'createSession'; name: string }
@@ -15,3 +15,4 @@ export type StoreAction =
   | { type: 'abandonGame'; gameId: string }
   | { type: 'clearState' }
   | { type: 'importState'; state: AppState }
+  | { type: 'importSession'; session: Session }

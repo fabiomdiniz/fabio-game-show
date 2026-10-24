@@ -60,7 +60,7 @@ export default function BoardGameScreen() {
           Start
         </button>
         <p>
-          <Link to={`/session/${sessionId}`}>Back</Link>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
         </p>
       </div>
     )
@@ -135,7 +135,7 @@ export default function BoardGameScreen() {
       <PointSummary awards={awards} />
 
       <p>
-        <Link to={`/session/${sessionId}`}>Back to main screen</Link>{' '}
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
       </p>
     </div>

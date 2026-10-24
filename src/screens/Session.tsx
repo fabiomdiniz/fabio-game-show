@@ -24,7 +24,8 @@ export default function Session() {
   return (
     <div className="page">
       <h1>{session.name}</h1>
-      <Link to="/">← Sessions</Link> <Link to={`/session/${session.id}/admin`}>Admin</Link>
+      <Link className="btn-link" to="/">← Sessions</Link>{' '}
+      <Link className="btn-link" to={`/session/${session.id}/admin`}>Admin</Link>
 
       <Scoreboard participants={session.participants} title={session.name} />
 

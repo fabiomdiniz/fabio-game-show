@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/StoreContext'
 import { feudCategories } from '../../content/feud'
 import PointSummary from '../../components/PointSummary'
 
 export default function FeudScreen() {
   const { id: sessionId } = useParams()
+  const navigate = useNavigate()
   const { state, beginGame, act } = useStore()
   const session = state.sessions.find((s) => s.id === sessionId)
 
@@ -126,7 +127,7 @@ export default function FeudScreen() {
           Start
         </button>
         <p>
-          <Link to={`/session/${sessionId}`}>Back</Link>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
         </p>
       </div>
     )
@@ -205,7 +206,7 @@ export default function FeudScreen() {
       <h2>Points earned</h2>
       <PointSummary awards={game.result?.awards ?? []} />
       <p>
-        <Link to={`/session/${sessionId}`}>Back to main screen</Link>{' '}
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
       </p>
     </div>

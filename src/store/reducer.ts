@@ -149,6 +149,17 @@ export function reducer(state: AppState, action: StoreAction): AppState {
     case 'importState':
       return action.state
 
+    case 'importSession': {
+      const session = state.sessions.some((s) => s.id === action.session.id)
+        ? { ...action.session, id: newId() }
+        : action.session
+      return {
+        ...state,
+        sessions: [...state.sessions, session],
+        activeSessionId: state.activeSessionId ?? session.id,
+      }
+    }
+
     default:
       return state
   }
