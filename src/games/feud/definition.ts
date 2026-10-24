@@ -19,7 +19,15 @@ function teamOf(state: FeudState, key: FeudTeamKey): FeudTeam {
 }
 
 function deltasFor(team: FeudTeam, roundTotal: number) {
-  return team.playerIds.map((participantId) => ({ participantId, delta: roundTotal }))
+  const n = team.playerIds.length
+  if (n === 0) return []
+  // Split the round total evenly; give any remainder to the first players.
+  const base = Math.floor(roundTotal / n)
+  const remainder = roundTotal % n
+  return team.playerIds.map((participantId, i) => ({
+    participantId,
+    delta: base + (i < remainder ? 1 : 0),
+  }))
 }
 
 function freshRound(): FeudRoundState {

@@ -180,7 +180,9 @@ export default function FeudScreen() {
     )
   }
 
-  // Points earned in THIS feud game only (appliedDeltas), so every new game starts at 0.
+  // Points earned in THIS feud game only (appliedDeltas). Each round's total is
+  // split evenly across the winning team's players (see deltasFor), so summing a
+  // team's players gives its score — and every new game starts at 0.
   const teamPoints = (playerIds: string[]) =>
     playerIds.reduce(
       (sum, pid) =>
