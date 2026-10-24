@@ -35,6 +35,7 @@ export default function Sessions() {
     <div className="page">
       <h1>Sessions</h1>
       <form
+        className="create-bar"
         onSubmit={(e) => {
           e.preventDefault()
           create()
@@ -50,8 +51,10 @@ export default function Sessions() {
           New session
         </button>
       </form>
-      <div>
-        <button onClick={() => fileRef.current?.click()}>Import session</button>
+      <div className="toolbar">
+        <button className="btn-ghost" onClick={() => fileRef.current?.click()}>
+          Import session
+        </button>
         <input
           ref={fileRef}
           type="file"
@@ -60,26 +63,28 @@ export default function Sessions() {
           onChange={onImportFile}
         />
       </div>
-      {importError && <p style={{ color: 'red' }}>Import error: {importError}</p>}
-      <ul>
-        {state.sessions.map((s) => (
-          <li key={s.id}>
-            <Link className="btn-link" to={`/session/${s.id}`}>
-              {s.name}
-            </Link>{' '}
-            <button
-              onClick={() => {
-                if (window.confirm(`Delete "${s.name}"?`)) {
-                  dispatch({ type: 'deleteSession', sessionId: s.id })
-                }
-              }}
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-      {state.sessions.length === 0 && <p>No sessions yet.</p>}
+      {importError && <p className="error">Import error: {importError}</p>}
+      {state.sessions.length === 0 ? (
+        <p className="empty">No sessions yet.</p>
+      ) : (
+        <ul className="session-list">
+          {state.sessions.map((s) => (
+            <li key={s.id} className="session-card">
+              <Link to={`/session/${s.id}`}>{s.name}</Link>
+              <button
+                className="btn-danger"
+                onClick={() => {
+                  if (window.confirm(`Delete "${s.name}"?`)) {
+                    dispatch({ type: 'deleteSession', sessionId: s.id })
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
