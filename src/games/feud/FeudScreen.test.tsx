@@ -223,11 +223,36 @@ describe('FeudScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Check' }))
 
     expect(screen.getByRole('heading', { name: 'Round over' })).toBeInTheDocument()
+    expect(screen.getByText(/Steal successful/)).toBeInTheDocument()
     expect(screen.getByText('Points awarded to Team B')).toBeInTheDocument()
 
     // finish the last question -> final screen
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
     expect(screen.getByText('Fábio-ly Feud — done')).toBeInTheDocument()
+  })
+
+  it('shows "Steal failed" when the stealing team misses', () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderFeud(sid)
+
+    fireEvent.click(screen.getByLabelText('assign-Ana-A'))
+    fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
+    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Strike' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Strike' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Strike' }))
+
+    // type a wrong answer -> the steal fails, controlling team keeps the round
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Not a real answer' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Check' }))
+
+    expect(screen.getByRole('heading', { name: 'Round over' })).toBeInTheDocument()
+    expect(screen.getByText(/Steal failed/)).toBeInTheDocument()
+    expect(screen.getByText('Points awarded to Team A')).toBeInTheDocument()
   })
 
   it('shows big strike Xs that fill as strikes accumulate', () => {
