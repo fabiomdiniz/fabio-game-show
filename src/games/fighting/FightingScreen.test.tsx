@@ -96,6 +96,38 @@ describe('FightingScreen', () => {
     expect(screen.getAllByText('TBD')).toHaveLength(1)
   })
 
+  it('restarts mid-tournament and discards partial progress', () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderScreen(sid)
+
+    // Advance Ana to put a decided match on the board.
+    fireEvent.click(screen.getByRole('button', { name: 'Ana' }))
+    expect(screen.getByRole('button', { name: /Undo/ })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Restart with same players' }))
+
+    // Fresh bracket: no decided matches, back in progress, same fighters.
+    expect(screen.getByText(/Tap a fighter/)).toBeInTheDocument()
+    expect(screen.queryByText(/Undo/)).not.toBeInTheDocument()
+    expect(screen.queryByTestId('champion')).not.toBeInTheDocument()
+    for (const name of ['Ana', 'Bruno', 'Carla']) {
+      expect(screen.getAllByText(name).length).toBeGreaterThan(0)
+    }
+  })
+
+  it('starts a new game from mid-tournament back to fighter select', () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderScreen(sid)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start a new game' }))
+
+    expect(screen.getByText('Select fighters (individual players only):')).toBeInTheDocument()
+    expect(screen.queryByText(/Tap a fighter/)).not.toBeInTheDocument()
+  })
+
   it('shows a final summary with fights, winner and points once the bracket is decided', () => {
     const { s, sid } = seed()
     saveState(s)
@@ -119,5 +151,28 @@ describe('FightingScreen', () => {
     // Only an explicit request goes back to fighter select.
     fireEvent.click(screen.getByText('Start a new game'))
     expect(screen.getByText('Select fighters (individual players only):')).toBeInTheDocument()
+  })
+
+  it('restarts with the same players and a freshly shuffled bracket', () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderScreen(sid)
+
+    // Play the bracket to completion (identity seed: Ana > Bruno, then Carla wins).
+    fireEvent.click(screen.getByRole('button', { name: 'Ana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Carla' }))
+    expect(screen.getByTestId('champion')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Restart with same players' }))
+
+    // Back in the in-progress bracket, not the setup form or the final summary.
+    expect(screen.getByText(/Tap a fighter/)).toBeInTheDocument()
+    expect(screen.queryByText('Select fighters (individual players only):')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('champion')).not.toBeInTheDocument()
+
+    // The same three fighters are in the fresh bracket.
+    for (const name of ['Ana', 'Bruno', 'Carla']) {
+      expect(screen.getAllByText(name).length).toBeGreaterThan(0)
+    }
   })
 })

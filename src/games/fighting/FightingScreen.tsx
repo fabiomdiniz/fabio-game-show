@@ -7,7 +7,7 @@ import Bracket from './BracketTree'
 
 export default function FightingScreen() {
   const { id: sessionId } = useParams()
-  const { state, beginGame, act } = useStore()
+  const { state, beginGame, act, abandonGame } = useStore()
   const session = state.sessions.find((s) => s.id === sessionId)
 
   const [firstPlace, setFirstPlace] = useState('10')
@@ -94,19 +94,43 @@ export default function FightingScreen() {
     const undo = (matchId: string) => {
       act(game.id, { type: 'undo', matchId })
     }
+    // Discard progress, then start fresh with the same fighters and a new shuffle.
+    const restartSamePlayers = () => {
+      abandonGame(game.id)
+      beginGame(sessionId!, 'fighting', {
+        firstPlacePoints: game.config.firstPlacePoints,
+        secondPlacePoints: game.config.secondPlacePoints,
+        entrants: game.config.entrants,
+      })
+    }
+    // Abandon the running game and go back to fighter select.
+    const startNewGame = () => {
+      abandonGame(game.id)
+      setDismissFinished(true)
+    }
     return (
       <div className="page">
         <h1>Fighting Game</h1>
         <p className="muted-hint">Tap a fighter to advance them — or tap a winner again to undo it.</p>
         <Bracket rounds={game.state.rounds} nameOf={nameOf} onPick={win} onUndo={undo} />
         <p>
-          <Link to={`/session/${sessionId}`}>Back</Link>
+          <Link to={`/session/${sessionId}`}>Back</Link>{' '}
+          <button onClick={restartSamePlayers}>Restart with same players</button>{' '}
+          <button onClick={startNewGame}>Start a new game</button>
         </p>
       </div>
     )
   }
 
   const { champion, runnerUp } = championOf(game.state.rounds)
+  // Same fighters, same points, fresh shuffled pairings (buildBracket uses Math.random).
+  const restartSamePlayers = () => {
+    beginGame(sessionId!, 'fighting', {
+      firstPlacePoints: game.config.firstPlacePoints,
+      secondPlacePoints: game.config.secondPlacePoints,
+      entrants: game.config.entrants,
+    })
+  }
   const awards = game.result?.awards ?? []
   const awarded = (pid: string | null) =>
     awards.filter((a) => a.participantId === pid).reduce((n, a) => n + a.delta, 0)
@@ -134,6 +158,7 @@ export default function FightingScreen() {
 
       <p>
         <Link to={`/session/${sessionId}`}>Back to main screen</Link>{' '}
+        <button onClick={restartSamePlayers}>Restart with same players</button>{' '}
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
       </p>
     </div>
