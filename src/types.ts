@@ -131,6 +131,7 @@ export interface FeudRoundState {
   revealed: number[]
   strikes: number
   roundTotal: number
+  winner?: FeudTeamKey | null
 }
 export interface FeudState {
   teamA: FeudTeam
@@ -145,6 +146,7 @@ export type FeudAction =
   | { type: 'reveal'; answerIndex: number }
   | { type: 'strike' }
   | { type: 'stealResult'; correct: boolean }
+  | { type: 'nextQuestion' }
 
 // ---- Jeopardy ----
 export interface JeopardyConfig {

@@ -1,6 +1,7 @@
 import type {
   FeudAction,
   FeudConfig,
+  FeudQuestion,
   FeudRoundState,
   FeudState,
   FeudTeam,
@@ -22,7 +23,7 @@ function deltasFor(team: FeudTeam, roundTotal: number) {
 }
 
 function freshRound(): FeudRoundState {
-  return { phase: 'faceOff', controllingTeam: null, revealed: [], strikes: 0, roundTotal: 0 }
+  return { phase: 'faceOff', controllingTeam: null, revealed: [], strikes: 0, roundTotal: 0, winner: null }
 }
 
 function advanceQuestion(state: FeudState): FeudState {
@@ -31,6 +32,14 @@ function advanceQuestion(state: FeudState): FeudState {
     return { ...state, questionIndex: nextIndex, finished: true, round: freshRound() }
   }
   return { ...state, questionIndex: nextIndex, round: freshRound() }
+}
+
+// Match a host-typed guess against a question's answers (case-insensitive, whitespace-tolerant).
+export function matchAnswerIndex(q: FeudQuestion, guess: string): number {
+  const normalize = (s: string) => s.toLowerCase().trim().replace(/\s+/g, ' ')
+  const g = normalize(guess)
+  if (!g) return -1
+  return q.answers.findIndex((a) => normalize(a.text) === g)
 }
 
 export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudAction> = {
@@ -70,27 +79,23 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
       case 'faceOffWinner': {
         if (s.round.phase !== 'faceOff') return { state: s, deltas: [] }
         if (a.team !== 'A' && a.team !== 'B') return { state: s, deltas: [] }
-        const topPoints = q.answers[0]?.points ?? 0
         return {
-          state: {
-            ...s,
-            round: { phase: 'board', controllingTeam: a.team, revealed: [0], strikes: 0, roundTotal: topPoints },
-          },
+          state: { ...s, round: { ...s.round, phase: 'board', controllingTeam: a.team } },
           deltas: [],
         }
       }
 
       case 'reveal': {
-        if (s.round.phase !== 'board') return { state: s, deltas: [] }
+        if (s.round.phase !== 'board' && s.round.phase !== 'faceOff') return { state: s, deltas: [] }
         if (s.round.revealed.includes(a.answerIndex)) return { state: s, deltas: [] }
         const answer = q.answers[a.answerIndex]
         if (!answer) return { state: s, deltas: [] }
         const revealed = [...s.round.revealed, a.answerIndex]
         const roundTotal = s.round.roundTotal + answer.points
-        if (revealed.length === q.answers.length) {
+        if (s.round.phase === 'board' && revealed.length === q.answers.length) {
           const controlling = s.round.controllingTeam!
           return {
-            state: advanceQuestion({ ...s, round: { ...s.round, revealed, roundTotal, phase: 'done' } }),
+            state: { ...s, round: { ...s.round, revealed, roundTotal, phase: 'done', winner: controlling } },
             deltas: deltasFor(teamOf(s, controlling), roundTotal),
           }
         }
@@ -110,9 +115,14 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
         const winner = a.correct ? otherTeamKey(controlling) : controlling
         const revealedAll = q.answers.map((_, i) => i)
         return {
-          state: advanceQuestion({ ...s, round: { ...s.round, phase: 'done', revealed: revealedAll } }),
+          state: { ...s, round: { ...s.round, phase: 'done', revealed: revealedAll, winner } },
           deltas: deltasFor(teamOf(s, winner), s.round.roundTotal),
         }
+      }
+
+      case 'nextQuestion': {
+        if (s.round.phase !== 'done') return { state: s, deltas: [] }
+        return { state: advanceQuestion(s), deltas: [] }
       }
 
       default:
