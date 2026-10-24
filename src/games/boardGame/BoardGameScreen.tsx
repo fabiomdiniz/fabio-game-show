@@ -22,7 +22,6 @@ export default function BoardGameScreen() {
 
   if (!session) return <p className="page">Session not found.</p>
 
-  // Keep showing the finished game's summary until the user asks for a new one.
   const lastFinishedGame = [...session.games]
     .reverse()
     .find((g) => g.kind === 'boardGame' && g.status === 'finished')
@@ -36,32 +35,40 @@ export default function BoardGameScreen() {
   if (!game) {
     return (
       <div className="page">
-        <h1>Board Game</h1>
-        <label>
-          Name{' '}
-          <input value={name} onChange={(e) => setName(e.target.value)} aria-label="Game name" />
-        </label>{' '}
-        <label>
-          Points per winner{' '}
-          <input
-            type="number"
-            min={1}
-            value={pointValue}
-            onChange={(e) => setPointValue(e.target.value)}
-            aria-label="Points"
-          />
-        </label>{' '}
-        <button
-          disabled={!name.trim() || !(Number(pointValue) > 0)}
-          onClick={() =>
-            beginGame(sessionId!, 'boardGame', { name: name.trim(), pointValue: Number(pointValue) })
-          }
-        >
-          Start
-        </button>
-        <p>
+        <div className="page-head">
+          <h1>Board Game</h1>
           <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
-        </p>
+        </div>
+        <form
+          className="stack"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (!name.trim() || !(Number(pointValue) > 0)) return
+            beginGame(sessionId!, 'boardGame', { name: name.trim(), pointValue: Number(pointValue) })
+          }}
+        >
+          <div className="form-grid">
+            <label className="field">
+              <span>Name</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} aria-label="Game name" />
+            </label>
+            <label className="field">
+              <span>Points per winner</span>
+              <input
+                type="number"
+                min={1}
+                value={pointValue}
+                onChange={(e) => setPointValue(e.target.value)}
+                aria-label="Points"
+              />
+            </label>
+          </div>
+          <div className="btn-row">
+            <button type="submit" disabled={!name.trim() || !(Number(pointValue) > 0)}>
+              Start
+            </button>
+          </div>
+        </form>
       </div>
     )
   }
@@ -71,7 +78,8 @@ export default function BoardGameScreen() {
       setWinners((ws) => (ws.includes(pid) ? ws.filter((x) => x !== pid) : [...ws, pid]))
     return (
       <div className="page">
-        <p>
+        <div className="page-head">
+          <h1>{game.config.name} is being played…</h1>
           <button
             onClick={() => {
               abandonGame(game.id)
@@ -80,35 +88,36 @@ export default function BoardGameScreen() {
           >
             Abandon game
           </button>
-        </p>
-        <h1>{game.config.name} is being played…</h1>
+        </div>
         <h2>Select winners</h2>
-        {session.participants.map((p) => (
-          <label key={p.id} style={{ display: 'block' }}>
-            <input
-              type="checkbox"
-              checked={winners.includes(p.id)}
-              onChange={() => toggle(p.id)}
-            />{' '}
-            {p.name}
-          </label>
-        ))}
-        <button
-          disabled={winners.length === 0}
-          onClick={() => {
-            // `act` finishes the game itself once the definition reports winners.
-            act(game.id, { type: 'award', winnerIds: winners })
-          }}
-        >
-          Award
-        </button>
+        <div className="check-list">
+          {session.participants.map((p) => (
+            <label key={p.id} className="check-row">
+              <input
+                type="checkbox"
+                checked={winners.includes(p.id)}
+                onChange={() => toggle(p.id)}
+              />{' '}
+              {p.name}
+            </label>
+          ))}
+        </div>
+        <div className="btn-row">
+          <button
+            disabled={winners.length === 0}
+            onClick={() => {
+              act(game.id, { type: 'award', winnerIds: winners })
+            }}
+          >
+            Award
+          </button>
+        </div>
       </div>
     )
   }
 
   const winnersIds = game.state.winners
   const awards = game.result?.awards ?? []
-  // Participants can be deleted after a game finishes, so don't call them TBD here.
   const displayName = (id: string) =>
     session.participants.find((p) => p.id === id)?.name || 'Unknown player'
   const awarded = (pid: string) =>
@@ -134,10 +143,10 @@ export default function BoardGameScreen() {
       <h2>Points earned</h2>
       <PointSummary awards={awards} />
 
-      <p>
-        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
+      <div className="btn-row">
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
-      </p>
+      </div>
     </div>
   )
 }

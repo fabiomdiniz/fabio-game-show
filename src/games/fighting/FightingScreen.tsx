@@ -24,7 +24,6 @@ export default function FightingScreen() {
 
   if (!session) return <p className="page">Session not found.</p>
 
-  // Keep showing the finished game's summary until the user asks for a new one.
   const lastFinishedGame = [...session.games]
     .reverse()
     .find((g) => g.kind === 'fighting' && g.status === 'finished')
@@ -36,7 +35,6 @@ export default function FightingScreen() {
         : undefined
 
   const individuals = session.participants.filter((p) => p.kind === 'individual')
-  // Slots not yet decided (later rounds, or a bye's empty side) read as TBD.
   const nameOf = (id: string | null) => session.participants.find((p) => p.id === id)?.name ?? 'TBD'
 
   if (!game) {
@@ -44,51 +42,57 @@ export default function FightingScreen() {
       setEntrants((es) => (es.includes(pid) ? es.filter((x) => x !== pid) : [...es, pid]))
     return (
       <div className="page">
-        <h1>Fighting Game</h1>
-        <p>Select fighters (individual players only):</p>
-        <p>
+        <div className="page-head">
+          <h1>Fighting Game</h1>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
+        </div>
+        <h2>Select fighters</h2>
+        <p className="section-hint">Select fighters (individual players only):</p>
+        <div className="btn-row">
           <button type="button" onClick={() => setEntrants(individuals.map((p) => p.id))}>
             Select all
-          </button>{' '}
+          </button>
           <button type="button" onClick={() => setEntrants([])}>
             Clear
           </button>
-        </p>
-        {individuals.map((p) => (
-          <label key={p.id} style={{ display: 'block' }}>
-            <input type="checkbox" checked={entrants.includes(p.id)} onChange={() => toggle(p.id)} />{' '}
-            {p.name}
+        </div>
+        <div className="check-list">
+          {individuals.map((p) => (
+            <label key={p.id} className="check-row">
+              <input type="checkbox" checked={entrants.includes(p.id)} onChange={() => toggle(p.id)} />{' '}
+              {p.name}
+            </label>
+          ))}
+        </div>
+        <div className="form-grid">
+          <label className="field">
+            <span>1st place</span>
+            <input type="number" min={1} value={firstPlace} onChange={(e) => setFirstPlace(e.target.value)} />
           </label>
-        ))}
-        <label>
-          1st place{' '}
-          <input type="number" min={1} value={firstPlace} onChange={(e) => setFirstPlace(e.target.value)} />
-        </label>{' '}
-        <label>
-          2nd place{' '}
-          <input type="number" min={1} value={secondPlace} onChange={(e) => setSecondPlace(e.target.value)} />
-        </label>{' '}
-        <button
-          disabled={entrants.length < 2 || !(Number(firstPlace) > 0) || !(Number(secondPlace) > 0)}
-          onClick={() =>
-            beginGame(sessionId!, 'fighting', {
-              firstPlacePoints: Number(firstPlace),
-              secondPlacePoints: Number(secondPlace),
-              entrants,
-            })
-          }
-        >
-          Start
-        </button>
-        <p>
-          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
-        </p>
+          <label className="field">
+            <span>2nd place</span>
+            <input type="number" min={1} value={secondPlace} onChange={(e) => setSecondPlace(e.target.value)} />
+          </label>
+        </div>
+        <div className="btn-row">
+          <button
+            disabled={entrants.length < 2 || !(Number(firstPlace) > 0) || !(Number(secondPlace) > 0)}
+            onClick={() =>
+              beginGame(sessionId!, 'fighting', {
+                firstPlacePoints: Number(firstPlace),
+                secondPlacePoints: Number(secondPlace),
+                entrants,
+              })
+            }
+          >
+            Start
+          </button>
+        </div>
       </div>
     )
   }
 
   if (game.status === 'inProgress') {
-    // `act` marks the game finished itself once the definition reports a champion.
     const win = (matchId: string, winnerId: string) => {
       act(game.id, { type: 'advance', matchId, winnerId })
     }
@@ -97,12 +101,12 @@ export default function FightingScreen() {
     }
     return (
       <div className="page">
-        <h1>Fighting Game</h1>
+        <div className="page-head">
+          <h1>Fighting Game</h1>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
+        </div>
         <p className="muted-hint">Tap a fighter to advance them — or tap a winner again to undo it.</p>
         <Bracket rounds={game.state.rounds} nameOf={nameOf} onPick={win} onUndo={undo} />
-        <p>
-          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
-        </p>
       </div>
     )
   }
@@ -111,7 +115,6 @@ export default function FightingScreen() {
   const awards = game.result?.awards ?? []
   const awarded = (pid: string | null) =>
     awards.filter((a) => a.participantId === pid).reduce((n, a) => n + a.delta, 0)
-  // Participants can be deleted after a game finishes, so don't call them TBD here.
   const displayName = (id: string | null) =>
     (id && session.participants.find((p) => p.id === id)?.name) || 'Unknown player'
 
@@ -133,10 +136,10 @@ export default function FightingScreen() {
       <h2>Tournament bracket</h2>
       <Bracket rounds={game.state.rounds} nameOf={displayName} />
 
-      <p>
-        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
+      <div className="btn-row">
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
-      </p>
+      </div>
     </div>
   )
 }

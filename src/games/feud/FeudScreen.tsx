@@ -56,79 +56,91 @@ export default function FeudScreen() {
 
     return (
       <div className="page">
-        <h1>Fábio-ly Feud</h1>
-        <div style={{ display: 'flex', gap: 16 }}>
-          <label>
-            Team A name{' '}
+        <div className="page-head">
+          <h1>Fábio-ly Feud</h1>
+          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
+        </div>
+
+        <div className="form-grid">
+          <label className="field">
+            <span>Team A name</span>
             <input value={teamAName} onChange={(e) => setTeamAName(e.target.value)} aria-label="Team A name" />
           </label>
-          <label>
-            Team B name{' '}
+          <label className="field">
+            <span>Team B name</span>
             <input value={teamBName} onChange={(e) => setTeamBName(e.target.value)} aria-label="Team B name" />
           </label>
         </div>
-        <p>Assign players to teams:</p>
-        <div style={{ display: 'flex', gap: 24 }}>
+
+        <h2>Teams</h2>
+        <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
           <fieldset>
             <legend>Team A players</legend>
-            {individuals.map((p) => (
-              <label key={p.id} style={{ display: 'block' }}>
-                <input
-                  type="checkbox"
-                  checked={teamAPlayers.includes(p.id)}
-                  onChange={() => toggleA(p.id)}
-                  aria-label={`assign-${p.name}-A`}
-                />{' '}
-                {p.name}
-              </label>
-            ))}
+            <div className="check-list">
+              {individuals.map((p) => (
+                <label key={p.id} className="check-row">
+                  <input
+                    type="checkbox"
+                    checked={teamAPlayers.includes(p.id)}
+                    onChange={() => toggleA(p.id)}
+                    aria-label={`assign-${p.name}-A`}
+                  />
+                  {p.name}
+                </label>
+              ))}
+            </div>
           </fieldset>
           <fieldset>
             <legend>Team B players</legend>
-            {individuals.map((p) => (
-              <label key={p.id} style={{ display: 'block' }}>
-                <input
-                  type="checkbox"
-                  checked={teamBPlayers.includes(p.id)}
-                  onChange={() => toggleB(p.id)}
-                  aria-label={`assign-${p.name}-B`}
-                />{' '}
-                {p.name}
-              </label>
-            ))}
+            <div className="check-list">
+              {individuals.map((p) => (
+                <label key={p.id} className="check-row">
+                  <input
+                    type="checkbox"
+                    checked={teamBPlayers.includes(p.id)}
+                    onChange={() => toggleB(p.id)}
+                    aria-label={`assign-${p.name}-B`}
+                  />
+                  {p.name}
+                </label>
+              ))}
+            </div>
           </fieldset>
         </div>
-        <p>Select questions:</p>
+
+        <h2>Questions</h2>
         {feudCategories.map((cat) => (
-          <div key={cat.id}>
+          <div key={cat.id} className="stack" style={{ gap: '0.5rem' }}>
             <strong>{cat.name}</strong>
-            {cat.questions.map((q) => (
-              <label key={q.id} style={{ display: 'block' }}>
-                <input
-                  type="checkbox"
-                  checked={questionIds.includes(q.id)}
-                  onChange={() => toggleQ(q.id)}
-                />{' '}
-                {q.question}
-              </label>
-            ))}
+            <div className="check-list">
+              {cat.questions.map((q) => (
+                <label key={q.id} className="check-row">
+                  <input
+                    type="checkbox"
+                    checked={questionIds.includes(q.id)}
+                    onChange={() => toggleQ(q.id)}
+                  />
+                  {q.question}
+                </label>
+              ))}
+            </div>
           </div>
         ))}
-        <button
-          disabled={!canStart}
-          onClick={() =>
-            beginGame(sessionId!, 'feud', {
-              teamA: { name: teamAName.trim(), playerIds: teamAPlayers },
-              teamB: { name: teamBName.trim(), playerIds: teamBPlayers },
-              questionIds,
-            })
-          }
-        >
-          Start
-        </button>
-        <p>
-          <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
-        </p>
+
+        <div className="btn-row">
+          <button
+            disabled={!canStart}
+            onClick={() =>
+              beginGame(sessionId!, 'feud', {
+                teamA: { name: teamAName.trim(), playerIds: teamAPlayers },
+                teamB: { name: teamBName.trim(), playerIds: teamBPlayers },
+                questionIds,
+              })
+            }
+          >
+            Start
+          </button>
+        </div>
       </div>
     )
   }
@@ -157,19 +169,21 @@ export default function FeudScreen() {
         </p>
 
         {round.phase === 'faceOff' && (
-          <div>
+          <div className="stack">
             <p>Who won the face-off?</p>
-            <button onClick={() => act(game.id, { type: 'faceOffWinner', team: 'A' })}>
-              {game.state.teamA.name}
-            </button>{' '}
-            <button onClick={() => act(game.id, { type: 'faceOffWinner', team: 'B' })}>
-              {game.state.teamB.name}
-            </button>
+            <div className="btn-row">
+              <button onClick={() => act(game.id, { type: 'faceOffWinner', team: 'A' })}>
+                {game.state.teamA.name}
+              </button>
+              <button onClick={() => act(game.id, { type: 'faceOffWinner', team: 'B' })}>
+                {game.state.teamB.name}
+              </button>
+            </div>
           </div>
         )}
 
         {(round.phase === 'board' || round.phase === 'steal') && (
-          <div>
+          <div className="stack">
             <p>
               Round total: {round.roundTotal} — controlling: {controllingTeam!.name} —
               strikes: {round.strikes}/3
@@ -188,10 +202,12 @@ export default function FeudScreen() {
               <button onClick={() => act(game.id, { type: 'strike' })}>Strike</button>
             )}
             {round.phase === 'steal' && (
-              <div>
+              <div className="stack">
                 <p>Steal by {otherTeam!.name}:</p>
-                <button onClick={() => act(game.id, { type: 'stealResult', correct: true })}>Correct</button>{' '}
-                <button onClick={() => act(game.id, { type: 'stealResult', correct: false })}>Incorrect</button>
+                <div className="btn-row">
+                  <button onClick={() => act(game.id, { type: 'stealResult', correct: true })}>Correct</button>
+                  <button onClick={() => act(game.id, { type: 'stealResult', correct: false })}>Incorrect</button>
+                </div>
               </div>
             )}
           </div>
@@ -205,10 +221,10 @@ export default function FeudScreen() {
       <h1>Fábio-ly Feud — done</h1>
       <h2>Points earned</h2>
       <PointSummary awards={game.result?.awards ?? []} />
-      <p>
-        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
+      <div className="btn-row">
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
-      </p>
+      </div>
     </div>
   )
 }

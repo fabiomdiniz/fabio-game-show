@@ -51,7 +51,7 @@ export default function Sessions() {
           New session
         </button>
       </form>
-      <div className="toolbar">
+      <div className="btn-row">
         <button className="btn-ghost" onClick={() => fileRef.current?.click()}>
           Import session
         </button>
@@ -70,7 +70,13 @@ export default function Sessions() {
         <ul className="session-list">
           {state.sessions.map((s) => (
             <li key={s.id} className="session-card">
-              <Link to={`/session/${s.id}`}>{s.name}</Link>
+              <div className="session-card-main">
+                <Link to={`/session/${s.id}`}>{s.name}</Link>
+                <span className="session-card-meta">
+                  {s.participants.length} players
+                  {s.games.length > 0 ? ` · ${s.games.length} game${s.games.length > 1 ? 's' : ''}` : ''}
+                </span>
+              </div>
               <button
                 className="btn-danger"
                 onClick={() => {

@@ -16,6 +16,7 @@ export default function ParticipantForm({ onAddPlayer }: Props) {
 
   return (
     <form
+      className="create-bar"
       onSubmit={(e) => {
         e.preventDefault()
         submit()
