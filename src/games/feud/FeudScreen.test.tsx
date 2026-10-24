@@ -7,7 +7,7 @@ import { StoreProvider } from '../../store/StoreContext'
 import { saveState } from '../../store/persistence'
 import { reducer } from '../../store/reducer'
 import { emptyState } from '../../store/state'
-import { feudCategories } from '../../content/feud'
+import { feudQuestions } from '../../content/feud'
 import type { GameInstance } from '../../types'
 
 function seed() {
@@ -22,7 +22,7 @@ function seed() {
 function seedFinishedFeud() {
   const { s, sid } = seed()
   const [ana, bruno] = s.sessions[0].participants
-  const q = feudCategories[0].questions[0]
+  const q = feudQuestions[0]
   const game: GameInstance = {
     id: 'g1',
     kind: 'feud',
@@ -82,7 +82,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
 
     expect(screen.getByRole('button', { name: 'Start' })).toBeEnabled()
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
@@ -112,7 +112,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Select all questions' }))
 
-    const totalQuestions = feudCategories.flatMap((c) => c.questions).length
+    const totalQuestions = feudQuestions.length
     const checked = screen.getAllByRole('checkbox').filter((cb) => (cb as HTMLInputElement).checked)
     expect(checked.length).toBe(totalQuestions)
   })
@@ -145,20 +145,20 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     // ranking is always visible: points shown, every answer hidden
-    expect(screen.getByText('40')).toBeInTheDocument()
-    expect(screen.getAllByText('???').length).toBe(4)
+    expect(screen.getByText('50')).toBeInTheDocument()
+    expect(screen.getAllByText('???').length).toBe(10)
 
     // face-off: pick Team A, then type the winning answer
     fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
-    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Instagram' } })
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Wartortle' } })
     fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
 
-    expect(screen.getByText('Instagram')).toBeInTheDocument()
-    expect(screen.getAllByText('???').length).toBe(3)
+    expect(screen.getByText('Wartortle')).toBeInTheDocument()
+    expect(screen.getAllByText('???').length).toBe(9)
   })
 
   it('starts a new game from the in-progress view', () => {
@@ -168,7 +168,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     expect(screen.getByText(/Question 1 of 1/)).toBeInTheDocument()
@@ -185,15 +185,15 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     // still in face-off: type the top answer directly
-    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Instagram' } })
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Wartortle' } })
     fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
 
-    expect(screen.getByText('Instagram')).toBeInTheDocument()
-    expect(screen.getAllByText('???').length).toBe(3)
+    expect(screen.getByText('Wartortle')).toBeInTheDocument()
+    expect(screen.getAllByText('???').length).toBe(9)
 
     // then choose which team controls
     fireEvent.click(screen.getByRole('button', { name: 'Team B' }))
@@ -207,7 +207,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     // into board phase, then three strikes -> steal
@@ -219,7 +219,7 @@ describe('FeudScreen', () => {
     expect(screen.getByText(/Steal by Team B/)).toBeInTheDocument()
 
     // type a correct (unrevealed) answer -> the steal succeeds, round-end screen shows
-    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Instagram' } })
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Wartortle' } })
     fireEvent.click(screen.getByRole('button', { name: 'Check' }))
 
     expect(screen.getByRole('heading', { name: 'Round over' })).toBeInTheDocument()
@@ -238,7 +238,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
@@ -262,7 +262,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     // into board phase
@@ -283,7 +283,7 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     expect(screen.getByTestId('team-a-score')).toHaveTextContent(/Team A/)
@@ -302,13 +302,13 @@ describe('FeudScreen', () => {
 
     fireEvent.click(screen.getByLabelText('assign-Ana-A'))
     fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
-    fireEvent.click(screen.getByLabelText(/Name a social media app/))
-    fireEvent.click(screen.getByLabelText(/binge-watch/))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
+    fireEvent.click(screen.getByLabelText(/Favorite Movies/))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     // round 1: Team A controls and reveals every answer
     fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
-    for (const answer of ['Instagram', 'WhatsApp', 'TikTok', 'X (Twitter)']) {
+    for (const answer of feudQuestions[0].answers.map((a) => a.text)) {
       fireEvent.change(screen.getByLabelText('answer'), { target: { value: answer } })
       fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
     }

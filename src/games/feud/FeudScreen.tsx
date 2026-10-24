@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/StoreContext'
-import { feudCategories } from '../../content/feud'
+import { feudQuestions } from '../../content/feud'
 import { matchAnswerIndex } from './definition'
 import PointSummary from '../../components/PointSummary'
 import wrongAnswerSound from './assets/wrong-answer-sound-effect.mp3'
@@ -61,7 +61,7 @@ export default function FeudScreen() {
       setTeamAPlayers((ids) => ids.filter((x) => x !== pid))
     }
     const selectAllQuestions = () => {
-      setQuestionIds(feudCategories.flatMap((c) => c.questions.map((q) => q.id)))
+      setQuestionIds(feudQuestions.map((q) => q.id))
     }
     const shuffle = (ids: string[]) => {
       const a = [...ids]
@@ -141,20 +141,15 @@ export default function FeudScreen() {
             Select all questions
           </button>
         </p>
-        {feudCategories.map((cat) => (
-          <div key={cat.id}>
-            <strong>{cat.name}</strong>
-            {cat.questions.map((q) => (
-              <label key={q.id} style={{ display: 'block' }}>
-                <input
-                  type="checkbox"
-                  checked={questionIds.includes(q.id)}
-                  onChange={() => toggleQ(q.id)}
-                />{' '}
-                {q.question}
-              </label>
-            ))}
-          </div>
+        {feudQuestions.map((q) => (
+          <label key={q.id} style={{ display: 'block' }}>
+            <input
+              type="checkbox"
+              checked={questionIds.includes(q.id)}
+              onChange={() => toggleQ(q.id)}
+            />{' '}
+            {q.question}
+          </label>
         ))}
         <button
           disabled={!canStart}
