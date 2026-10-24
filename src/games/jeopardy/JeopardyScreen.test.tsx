@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import '../register'
 import JeopardyScreen from './JeopardyScreen'
@@ -47,6 +47,15 @@ function seedFinishedJeopardy() {
   return { s, sid }
 }
 
+function seedSessionWithParticipants() {
+  let s = emptyState()
+  s = reducer(s, { type: 'createSession', name: 'Show' })
+  const sid = s.activeSessionId!
+  s = reducer(s, { type: 'addParticipant', sessionId: sid, name: 'Ana', kind: 'individual' })
+  s = reducer(s, { type: 'addParticipant', sessionId: sid, name: 'Bruno', kind: 'individual' })
+  return { s, sid }
+}
+
 function renderJeopardy(sid: string) {
   return render(
     <MemoryRouter initialEntries={[`/session/${sid}/game/jeopardy`]}>
@@ -75,5 +84,31 @@ describe('JeopardyScreen', () => {
     expect(screen.getByText('+10')).toBeInTheDocument()
     expect(screen.getByText('Bruno')).toBeInTheDocument()
     expect(screen.getByText('-5')).toBeInTheDocument()
+  })
+
+  it('select all and clear buttons toggle participants and categories', () => {
+    const { s, sid } = seedSessionWithParticipants()
+    saveState(s)
+    renderJeopardy(sid)
+
+    const participantCheckboxes = screen.getAllByRole('checkbox').slice(0, 2)
+    const categoryCheckboxes = screen.getAllByRole('checkbox').slice(2)
+    const selectAllButtons = screen.getAllByRole('button', { name: 'Select all' })
+    const clearButtons = screen.getAllByRole('button', { name: 'Clear' })
+
+    expect(participantCheckboxes.every((c) => !(c as HTMLInputElement).checked)).toBe(true)
+    expect(categoryCheckboxes.every((c) => !(c as HTMLInputElement).checked)).toBe(true)
+
+    fireEvent.click(selectAllButtons[0])
+    fireEvent.click(selectAllButtons[1])
+
+    expect(participantCheckboxes.every((c) => (c as HTMLInputElement).checked)).toBe(true)
+    expect(categoryCheckboxes.every((c) => (c as HTMLInputElement).checked)).toBe(true)
+
+    fireEvent.click(clearButtons[0])
+    fireEvent.click(clearButtons[1])
+
+    expect(participantCheckboxes.every((c) => !(c as HTMLInputElement).checked)).toBe(true)
+    expect(categoryCheckboxes.every((c) => !(c as HTMLInputElement).checked)).toBe(true)
   })
 })
