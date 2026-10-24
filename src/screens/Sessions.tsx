@@ -50,9 +50,7 @@ export default function Sessions() {
         <button type="submit" disabled={!name.trim()}>
           New session
         </button>
-      </form>
-      <div className="btn-row">
-        <button className="btn-ghost" onClick={() => fileRef.current?.click()}>
+        <button type="button" className="btn-ghost" onClick={() => fileRef.current?.click()}>
           Import session
         </button>
         <input
@@ -62,7 +60,7 @@ export default function Sessions() {
           style={{ display: 'none' }}
           onChange={onImportFile}
         />
-      </div>
+      </form>
       {importError && <p className="error">Import error: {importError}</p>}
       {state.sessions.length === 0 ? (
         <p className="empty">No sessions yet.</p>

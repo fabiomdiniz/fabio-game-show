@@ -125,25 +125,30 @@ export default function Admin() {
         </tbody>
       </table>
 
-      <h2>Add participant</h2>
-      <ParticipantForm
-        onAddPlayer={(name) =>
-          dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'individual' })
-        }
-      />
-
-      <h2>Storage</h2>
-      <div className="btn-row">
-        <button onClick={() => exportState(state)}>Export state</button>
-        <button onClick={() => fileRef.current?.click()}>Import state</button>
-        <button
-          className="btn-danger"
-          onClick={() => {
-            if (window.confirm('Clear all state?')) dispatch({ type: 'clearState' })
-          }}
-        >
-          Clear all
-        </button>
+      <div className="admin-cols">
+        <section>
+          <h2>Add participant</h2>
+          <ParticipantForm
+            onAddPlayer={(name) =>
+              dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'individual' })
+            }
+          />
+        </section>
+        <section>
+          <h2>Storage</h2>
+          <div className="btn-row">
+            <button onClick={() => exportState(state)}>Export state</button>
+            <button onClick={() => fileRef.current?.click()}>Import state</button>
+            <button
+              className="btn-danger"
+              onClick={() => {
+                if (window.confirm('Clear all state?')) dispatch({ type: 'clearState' })
+              }}
+            >
+              Clear all
+            </button>
+          </div>
+        </section>
       </div>
       <input
         ref={fileRef}

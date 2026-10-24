@@ -31,34 +31,39 @@ export default function Session() {
         </div>
       </div>
 
-      <Scoreboard participants={session.participants} />
+      <div className="session-cols">
+        <div className="session-main">
+          <Scoreboard participants={session.participants} />
+          <h2>Add participant</h2>
+          <ParticipantForm
+            onAddPlayer={(name) =>
+              dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'individual' })
+            }
+          />
+        </div>
 
-      <h2>Add participant</h2>
-      <ParticipantForm
-        onAddPlayer={(name) =>
-          dispatch({ type: 'addParticipant', sessionId: session.id, name, kind: 'individual' })
-        }
-      />
-
-      <h2 className="menu-title">Main Menu</h2>
-      {activeGame && (
-        <p>
-          A game is already in progress.{' '}
-          <Link to={`/session/${session.id}/game/${activeGame.kind}`}>Resume game</Link>
-        </p>
-      )}
-      <div className="menu-grid">
-        {CATALOG.map((g) => (
-          <Link
-            key={g.kind}
-            className={`menu-card${inProgress ? ' disabled' : ''}`}
-            to={`/session/${session.id}/game/${g.kind}`}
-            aria-disabled={inProgress}
-          >
-            <span className="menu-card-title">{g.title}</span>
-            <span className="menu-card-blurb">{g.blurb}</span>
-          </Link>
-        ))}
+        <div className="session-side">
+          <h2 className="menu-title">Main Menu</h2>
+          {activeGame && (
+            <p>
+              A game is already in progress.{' '}
+              <Link to={`/session/${session.id}/game/${activeGame.kind}`}>Resume game</Link>
+            </p>
+          )}
+          <div className="menu-grid">
+            {CATALOG.map((g) => (
+              <Link
+                key={g.kind}
+                className={`menu-card${inProgress ? ' disabled' : ''}`}
+                to={`/session/${session.id}/game/${g.kind}`}
+                aria-disabled={inProgress}
+              >
+                <span className="menu-card-title">{g.title}</span>
+                <span className="menu-card-blurb">{g.blurb}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
