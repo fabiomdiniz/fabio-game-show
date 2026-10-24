@@ -97,9 +97,11 @@ describe('feud definition', () => {
     }
     const r = def.applyAction(s, { type: 'reveal', answerIndex: q.answers.length - 1 })
     const total = q.answers.reduce((sum, a) => sum + a.points, 0)
-    expect(r.deltas).toEqual(
-      config.teamA.playerIds.map((participantId) => ({ participantId, delta: total })),
-    )
+    // round total is split evenly across the 2 controlling players (275 -> 138 + 137)
+    expect(r.deltas).toEqual([
+      { participantId: 'a1', delta: Math.ceil(total / 2) },
+      { participantId: 'a2', delta: Math.floor(total / 2) },
+    ])
     expect(r.state.round.phase).toBe('done')
     expect(r.state.round.winner).toBe('A')
     expect(r.state.finished).toBe(false)

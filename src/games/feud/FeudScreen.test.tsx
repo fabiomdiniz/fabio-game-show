@@ -291,6 +291,35 @@ describe('FeudScreen', () => {
     expect(screen.getByTestId('team-b-score')).toHaveTextContent(/Team B/)
   })
 
+  it('team score is the round total, not multiplied by team size', () => {
+    let s = emptyState()
+    s = reducer(s, { type: 'createSession', name: 'Show' })
+    const sid = s.activeSessionId!
+    for (const name of ['Ana', 'Bruno', 'Carla']) {
+      s = reducer(s, { type: 'addParticipant', sessionId: sid, name, kind: 'individual' })
+    }
+    saveState(s)
+    renderFeud(sid)
+
+    fireEvent.click(screen.getByLabelText('assign-Ana-A'))
+    fireEvent.click(screen.getByLabelText('assign-Bruno-A'))
+    fireEvent.click(screen.getByLabelText('assign-Carla-B'))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    // Team A (2 players) controls and reveals every answer -> round over
+    fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
+    for (const answer of feudQuestions[0].answers.map((a) => a.text)) {
+      fireEvent.change(screen.getByLabelText('answer'), { target: { value: answer } })
+      fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
+    }
+
+    const roundTotal = feudQuestions[0].answers.reduce((sum, a) => sum + a.points, 0)
+    // Team A has 2 players; the score must be roundTotal (not 2x roundTotal)
+    expect(screen.getByTestId('team-a-score')).toHaveTextContent(new RegExp(`${roundTotal} points`))
+    expect(screen.getByTestId('team-b-score')).toHaveTextContent(/0 points/)
+  })
+
   it('ends the game early and declares the leading team the winner', () => {
     let s = emptyState()
     s = reducer(s, { type: 'createSession', name: 'Show' })
