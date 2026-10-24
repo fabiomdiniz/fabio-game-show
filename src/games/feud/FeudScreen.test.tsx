@@ -275,4 +275,50 @@ describe('FeudScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Strike' }))
     expect(screen.getByTestId('strikes')).toHaveAttribute('aria-label', '2 of 3 strikes')
   })
+
+  it("always shows each team's total points", () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderFeud(sid)
+
+    fireEvent.click(screen.getByLabelText('assign-Ana-A'))
+    fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
+    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    expect(screen.getByTestId('team-a-score')).toHaveTextContent(/Team A/)
+    expect(screen.getByTestId('team-a-score')).toHaveTextContent(/0 points/)
+    expect(screen.getByTestId('team-b-score')).toHaveTextContent(/Team B/)
+  })
+
+  it('ends the game early and declares the leading team the winner', () => {
+    let s = emptyState()
+    s = reducer(s, { type: 'createSession', name: 'Show' })
+    const sid = s.activeSessionId!
+    s = reducer(s, { type: 'addParticipant', sessionId: sid, name: 'Ana', kind: 'individual' })
+    s = reducer(s, { type: 'addParticipant', sessionId: sid, name: 'Bruno', kind: 'individual' })
+    saveState(s)
+    renderFeud(sid)
+
+    fireEvent.click(screen.getByLabelText('assign-Ana-A'))
+    fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
+    fireEvent.click(screen.getByLabelText(/Name a social media app/))
+    fireEvent.click(screen.getByLabelText(/binge-watch/))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    // round 1: Team A controls and reveals every answer
+    fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
+    for (const answer of ['Instagram', 'WhatsApp', 'TikTok', 'X (Twitter)']) {
+      fireEvent.change(screen.getByLabelText('answer'), { target: { value: answer } })
+      fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
+    }
+    expect(screen.getByRole('heading', { name: 'Round over' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Next question' }))
+
+    // on the second question, end the game early
+    fireEvent.click(screen.getByRole('button', { name: 'End game' }))
+
+    expect(screen.getByText('Fábio-ly Feud — done')).toBeInTheDocument()
+    expect(screen.getByTestId('winner')).toHaveTextContent(/Team A/)
+  })
 })

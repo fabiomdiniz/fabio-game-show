@@ -175,6 +175,15 @@ export default function FeudScreen() {
     )
   }
 
+  const teamAPoints = game.state.teamA.playerIds.reduce(
+    (sum, pid) => sum + (session.participants.find((p) => p.id === pid)?.points ?? 0),
+    0,
+  )
+  const teamBPoints = game.state.teamB.playerIds.reduce(
+    (sum, pid) => sum + (session.participants.find((p) => p.id === pid)?.points ?? 0),
+    0,
+  )
+
   if (game.status === 'inProgress') {
     const q = game.state.questions[game.state.questionIndex]
     const round = game.state.round
@@ -220,6 +229,14 @@ export default function FeudScreen() {
     return (
       <div className="page">
         <h1>Fábio-ly Feud</h1>
+        <div style={{ display: 'flex', gap: 24, margin: '0 0 12px', fontSize: '1.15rem' }}>
+          <span data-testid="team-a-score">
+            <strong>{game.state.teamA.name}</strong> — {teamAPoints} points
+          </span>
+          <span data-testid="team-b-score">
+            <strong>{game.state.teamB.name}</strong> — {teamBPoints} points
+          </span>
+        </div>
         <p>
           Question {game.state.questionIndex + 1} of {game.state.questions.length}: {q.question}
         </p>
@@ -352,15 +369,26 @@ export default function FeudScreen() {
         )}
 
         <p>
+          <button onClick={() => act(game.id, { type: 'endGame' })}>End game</button>{' '}
           <button onClick={startNewGame}>Start a new game</button>
         </p>
       </div>
     )
   }
 
+  const champion =
+    teamAPoints === teamBPoints ? null : teamAPoints > teamBPoints ? game.state.teamA : game.state.teamB
+
   return (
     <div className="page">
       <h1>Fábio-ly Feud — done</h1>
+      {champion ? (
+        <p data-testid="winner">
+          Winner: <strong>{champion.name}</strong>
+        </p>
+      ) : (
+        <p data-testid="winner">It's a tie!</p>
+      )}
       <h2>Points earned</h2>
       <PointSummary awards={game.result?.awards ?? []} />
       <p>

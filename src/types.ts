@@ -147,6 +147,7 @@ export type FeudAction =
   | { type: 'strike' }
   | { type: 'stealResult'; correct: boolean }
   | { type: 'nextQuestion' }
+  | { type: 'endGame' }
 
 // ---- Jeopardy ----
 export interface JeopardyConfig {

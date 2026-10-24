@@ -125,6 +125,10 @@ export const feudDefinition: GameDefinition<'feud', FeudConfig, FeudState, FeudA
         return { state: advanceQuestion(s), deltas: [] }
       }
 
+      case 'endGame': {
+        return { state: { ...s, finished: true }, deltas: [] }
+      }
+
       default:
         return { state: s, deltas: [] }
     }
