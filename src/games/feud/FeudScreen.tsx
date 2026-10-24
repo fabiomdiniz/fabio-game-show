@@ -180,14 +180,15 @@ export default function FeudScreen() {
     )
   }
 
-  const teamAPoints = game.state.teamA.playerIds.reduce(
-    (sum, pid) => sum + (session.participants.find((p) => p.id === pid)?.points ?? 0),
-    0,
-  )
-  const teamBPoints = game.state.teamB.playerIds.reduce(
-    (sum, pid) => sum + (session.participants.find((p) => p.id === pid)?.points ?? 0),
-    0,
-  )
+  // Points earned in THIS feud game only (appliedDeltas), so every new game starts at 0.
+  const teamPoints = (playerIds: string[]) =>
+    playerIds.reduce(
+      (sum, pid) =>
+        sum + game.appliedDeltas.filter((d) => d.participantId === pid).reduce((n, d) => n + d.delta, 0),
+      0,
+    )
+  const teamAPoints = teamPoints(game.state.teamA.playerIds)
+  const teamBPoints = teamPoints(game.state.teamB.playerIds)
 
   if (game.status === 'inProgress') {
     const q = game.state.questions[game.state.questionIndex]
