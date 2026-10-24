@@ -27,7 +27,7 @@ export default function Session() {
       <Link className="btn-link" to="/">← Sessions</Link>{' '}
       <Link className="btn-link" to={`/session/${session.id}/admin`}>Admin</Link>
 
-      <Scoreboard participants={session.participants} title={session.name} />
+      <Scoreboard participants={session.participants} />
 
       <h2>Add participant</h2>
       <ParticipantForm
@@ -43,17 +43,17 @@ export default function Session() {
           <Link to={`/session/${session.id}/game/${activeGame.kind}`}>Resume game</Link>
         </p>
       )}
-      <div className="menu-body">
-        <div className="menu-preview" aria-hidden="true"></div>
-        <ol className="menu-list">
-          {CATALOG.map((g) => (
-            <li key={g.kind} className={`menu-item${inProgress ? ' disabled' : ''}`}>
-              <Link to={`/session/${session.id}/game/${g.kind}`} aria-disabled={inProgress}>
-                {g.title}
-              </Link>
-            </li>
-          ))}
-        </ol>
+      <div className="menu-grid">
+        {CATALOG.map((g) => (
+          <Link
+            key={g.kind}
+            className={`menu-card${inProgress ? ' disabled' : ''}`}
+            to={`/session/${session.id}/game/${g.kind}`}
+            aria-disabled={inProgress}
+          >
+            <span className="menu-card-title">{g.title}</span>
+          </Link>
+        ))}
       </div>
     </div>
   )

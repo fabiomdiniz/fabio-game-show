@@ -158,7 +158,7 @@ export default function Admin() {
           e.target.value = ''
         }}
       />
-      {error && <p style={{ color: 'red' }}>Import error: {error}</p>}
+      {error && <p className="error">Import error: {error}</p>}
     </div>
   )
 }

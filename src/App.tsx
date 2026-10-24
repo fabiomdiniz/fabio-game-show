@@ -14,17 +14,18 @@ export default function App() {
       <BrowserRouter>
         <div className="app-shell">
           <CornerMascot />
-          <header className="topbar wrap">
-            <span className="wordmark">
-              <Link to="/">
-                FÁBIO<span className="dot">·</span>GAME SHOW
-              </Link>
-            </span>
-            <nav className="topnav" aria-label="Primary">
-              <Link to="/">Sessions</Link>
-            </nav>
+          <header className="topbar">
+            <div className="wrap topbar-inner">
+              <span className="wordmark">
+                <Link to="/">
+                  FÁBIO<span className="dot">·</span>GAME SHOW
+                </Link>
+              </span>
+              <nav className="topnav" aria-label="Primary">
+                <Link to="/">Sessions</Link>
+              </nav>
+            </div>
           </header>
-          <div className="checker" aria-hidden="true"></div>
           <main>
             <Breadcrumbs />
             <Routes>

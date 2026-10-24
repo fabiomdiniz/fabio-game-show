@@ -69,4 +69,15 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-pill: 999px;
+
+  /* ---- elevation (soft depth — modern restyle) ---- */
+  --shadow-xs: 0 1px 2px oklch(27% 0.200 275 / 0.05);
+  --shadow-sm: 0 1px 3px oklch(27% 0.200 275 / 0.07), 0 4px 12px oklch(27% 0.200 275 / 0.06);
+  --shadow-md: 0 2px 6px oklch(27% 0.200 275 / 0.07), 0 12px 32px oklch(27% 0.200 275 / 0.10);
+  --shadow-lg: 0 4px 12px oklch(27% 0.200 275 / 0.09), 0 24px 64px oklch(27% 0.200 275 / 0.14);
+  --shadow-accent: 0 2px 6px oklch(38% 0.170 26 / 0.22), 0 10px 28px oklch(38% 0.170 26 / 0.16);
+
+  /* ---- surfaces ---- */
+  --surface: oklch(96% 0.028 95);           /* near-white cream card */
+  --hairline: oklch(27% 0.200 275 / 0.12);  /* soft indigo hairline */
 }
