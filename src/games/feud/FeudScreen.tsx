@@ -193,6 +193,8 @@ export default function FeudScreen() {
     const winnerTeamName =
       round.winner === 'A' ? game.state.teamA.name : round.winner === 'B' ? game.state.teamB.name : null
     const isLastQuestion = game.state.questionIndex + 1 >= game.state.questions.length
+    // A steal is the only path that ends a round with 3 strikes (all-revealed caps at 2).
+    const wasSteal = round.strikes === 3
 
     const submitGuess = () => {
       const idx = matchAnswerIndex(q, guess)
@@ -334,6 +336,13 @@ export default function FeudScreen() {
         {round.phase === 'done' && (
           <div>
             <h2>Round over</h2>
+            {wasSteal && (
+              <p>
+                {round.winner !== round.controllingTeam
+                  ? 'Steal successful — the stealing team takes the round.'
+                  : 'Steal failed — the controlling team keeps the round.'}
+              </p>
+            )}
             <p>Round total: {round.roundTotal} points</p>
             {winnerTeamName && <p>Points awarded to {winnerTeamName}</p>}
             <button onClick={() => act(game.id, { type: 'nextQuestion' })}>
