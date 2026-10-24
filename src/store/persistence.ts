@@ -235,14 +235,25 @@ export async function importFile(file: File): Promise<{ state: AppState | null; 
   }
 }
 
-export async function importSessionFile(file: File): Promise<{ session: Session | null; error: string | null }> {
+export async function importSessionFile(
+  file: File,
+): Promise<{ sessions: Session[] | null; error: string | null }> {
   try {
     const text = await readFileText(file)
     const value: unknown = JSON.parse(text)
+
+    // Accept both a full-state export (as written by `exportState`) and a bare
+    // session object. A full state contributes every session it holds.
+    if (isObj(value) && Array.isArray(value.sessions)) {
+      const err = validateState(value)
+      if (err) return { sessions: null, error: err }
+      return { sessions: (value as unknown as AppState).sessions, error: null }
+    }
+
     const err = validateSession(value)
-    if (err) return { session: null, error: err }
-    return { session: value as Session, error: null }
+    if (err) return { sessions: null, error: err }
+    return { sessions: [value as Session], error: null }
   } catch {
-    return { session: null, error: 'Could not read file' }
+    return { sessions: null, error: 'Could not read file' }
   }
 }

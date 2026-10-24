@@ -44,6 +44,23 @@ describe('Sessions', () => {
     await waitFor(() => expect(screen.getByText('Imported Show')).toBeInTheDocument())
   })
 
+  it('imports every session from a full-state export', async () => {
+    renderSessions()
+    const fullState = {
+      version: 1,
+      sessions: [
+        { id: 's-a', name: 'Show A', participants: [], games: [] },
+        { id: 's-b', name: 'Show B', participants: [], games: [] },
+      ],
+      activeSessionId: 's-a',
+    }
+    const file = new File([JSON.stringify(fullState)], 'state.json', { type: 'application/json' })
+    const fileInput = document.querySelector('input[type=file]') as HTMLInputElement
+    fireEvent.change(fileInput, { target: { files: [file] } })
+    await waitFor(() => expect(screen.getByText('Show A')).toBeInTheDocument())
+    expect(screen.getByText('Show B')).toBeInTheDocument()
+  })
+
   it('shows an import error for an invalid session file', async () => {
     renderSessions()
     const file = new File(['{"name": "No id"}'], 'session.json', { type: 'application/json' })
