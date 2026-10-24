@@ -18,14 +18,14 @@ export default function PointSummary({ awards }: { awards: PointDelta[] }) {
       <thead>
         <tr>
           <th>Player</th>
-          <th>Points earned</th>
+          <th className="num">Points earned</th>
         </tr>
       </thead>
       <tbody>
         {rows.map((row) => (
           <tr key={row.name}>
             <td>{row.name}</td>
-            <td>{row.points > 0 ? `+${row.points}` : row.points}</td>
+            <td className="num">{row.points > 0 ? `+${row.points}` : row.points}</td>
           </tr>
         ))}
       </tbody>

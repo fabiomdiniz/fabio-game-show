@@ -44,90 +44,104 @@ export default function JeopardyScreen() {
       setCategoryIds((ids) => (ids.includes(cid) ? ids.filter((x) => x !== cid) : [...ids, cid]))
     return (
       <div className="page">
-        <h1>What is… Panda?</h1>
-        <p>Participants:</p>
-        {session.participants.map((p) => (
-          <label key={p.id} style={{ display: 'block' }}>
-            <input type="checkbox" checked={participantIds.includes(p.id)} onChange={() => toggleP(p.id)} /> {p.name}
-          </label>
-        ))}
-        <p>Categories:</p>
-        {jeopardyBoard.categories.map((c) => (
-          <label key={c.id} style={{ display: 'block' }}>
-            <input type="checkbox" checked={categoryIds.includes(c.id)} onChange={() => toggleC(c.id)} /> {c.name}
-          </label>
-        ))}
-        <button
-          disabled={participantIds.length === 0 || categoryIds.length === 0}
-          onClick={() => beginGame(sessionId!, 'jeopardy', { participantIds, categoryIds })}
-        >
-          Start
-        </button>
-        <p>
+        <div className="page-head">
+          <h1>What is… Panda?</h1>
           <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
-        </p>
+        </div>
+        <h2>Participants</h2>
+        <div className="check-list">
+          {session.participants.map((p) => (
+            <label key={p.id} className="check-row">
+              <input type="checkbox" checked={participantIds.includes(p.id)} onChange={() => toggleP(p.id)} />{' '}
+              {p.name}
+            </label>
+          ))}
+        </div>
+        <h2>Categories</h2>
+        <div className="check-list">
+          {jeopardyBoard.categories.map((c) => (
+            <label key={c.id} className="check-row">
+              <input type="checkbox" checked={categoryIds.includes(c.id)} onChange={() => toggleC(c.id)} />{' '}
+              {c.name}
+            </label>
+          ))}
+        </div>
+        <div className="btn-row">
+          <button
+            disabled={participantIds.length === 0 || categoryIds.length === 0}
+            onClick={() => beginGame(sessionId!, 'jeopardy', { participantIds, categoryIds })}
+          >
+            Start
+          </button>
+        </div>
       </div>
     )
   }
 
   if (game.status === 'inProgress') {
-    const activeClue = activeClueId ? game.state.categories.flatMap((c) => c.clues).find((c) => c.id === activeClueId) : undefined
+    const activeClue = activeClueId
+      ? game.state.categories.flatMap((c) => c.clues).find((c) => c.id === activeClueId)
+      : undefined
 
     if (game.state.phase === 'board') {
       return (
         <div className="page">
-          <p>
-            <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
-            <button onClick={() => abandonGame(game.id)}>Abandon game</button>
-          </p>
-          <h1>What is… Panda?</h1>
+          <div className="page-head">
+            <h1>What is… Panda?</h1>
+            <div className="btn-row">
+              <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>
+              <button onClick={() => abandonGame(game.id)}>Abandon game</button>
+            </div>
+          </div>
           {activeClue && (
-            <div>
+            <div className="stack">
               <p>
                 <strong>{activeClue.clue}</strong> (value {activeClue.value})
               </p>
               {activeClue.dailyDouble ? (
-                <div>
+                <div className="btn-row">
                   <label>
                     Wager{' '}
                     <input type="number" min={0} value={wager} onChange={(e) => setWager(e.target.value)} />
-                  </label>{' '}
+                  </label>
                 </div>
               ) : null}
-              <select value={responderId} onChange={(e) => setResponderId(e.target.value)} aria-label="Responder">
-                <option value="">…</option>
-                {game.state.categories && session.participants
-                  .filter((p) => participantIds.includes(p.id) || game.config.participantIds.includes(p.id))
-                  .map((p) => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-              </select>{' '}
-              <button
-                disabled={!responderId}
-                onClick={() => {
-                  if (activeClue.dailyDouble) {
-                    act(game.id, { type: 'dailyDoubleWager', clueId: activeClue.id, responderId, wager: Number(wager), correct: true })
-                  } else {
-                    act(game.id, { type: 'revealClue', clueId: activeClue.id, responderId, correct: true })
-                  }
-                  setActiveClueId(null)
-                }}
-              >
-                Correct
-              </button>{' '}
-              <button
-                disabled={!responderId}
-                onClick={() => {
-                  if (activeClue.dailyDouble) {
-                    act(game.id, { type: 'dailyDoubleWager', clueId: activeClue.id, responderId, wager: Number(wager), correct: false })
-                  } else {
-                    act(game.id, { type: 'revealClue', clueId: activeClue.id, responderId, correct: false })
-                  }
-                  setActiveClueId(null)
-                }}
-              >
-                Incorrect
-              </button>
+              <div className="btn-row">
+                <select value={responderId} onChange={(e) => setResponderId(e.target.value)} aria-label="Responder">
+                  <option value="">…</option>
+                  {game.state.categories && session.participants
+                    .filter((p) => participantIds.includes(p.id) || game.config.participantIds.includes(p.id))
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                </select>
+                <button
+                  disabled={!responderId}
+                  onClick={() => {
+                    if (activeClue.dailyDouble) {
+                      act(game.id, { type: 'dailyDoubleWager', clueId: activeClue.id, responderId, wager: Number(wager), correct: true })
+                    } else {
+                      act(game.id, { type: 'revealClue', clueId: activeClue.id, responderId, correct: true })
+                    }
+                    setActiveClueId(null)
+                  }}
+                >
+                  Correct
+                </button>
+                <button
+                  disabled={!responderId}
+                  onClick={() => {
+                    if (activeClue.dailyDouble) {
+                      act(game.id, { type: 'dailyDoubleWager', clueId: activeClue.id, responderId, wager: Number(wager), correct: false })
+                    } else {
+                      act(game.id, { type: 'revealClue', clueId: activeClue.id, responderId, correct: false })
+                    }
+                    setActiveClueId(null)
+                  }}
+                >
+                  Incorrect
+                </button>
+              </div>
             </div>
           )}
           <table>
@@ -173,37 +187,41 @@ export default function JeopardyScreen() {
       const eligible = game.config.participantIds.filter((pid) => (game.state.scores[pid] ?? 0) > 0)
       return (
         <div className="page">
-          <p>
-            <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
-            <button onClick={() => abandonGame(game.id)}>Abandon game</button>
-          </p>
-          <h1>Final Jeopardy</h1>
+          <div className="page-head">
+            <h1>Final Jeopardy</h1>
+            <div className="btn-row">
+              <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>
+              <button onClick={() => abandonGame(game.id)}>Abandon game</button>
+            </div>
+          </div>
           <p>
             <strong>{game.state.finalJeopardy.category}:</strong> {game.state.finalJeopardy.clue}
           </p>
           {eligible.length === 0 && (
             <button onClick={() => act(game.id, { type: 'finishFinal' })}>Finish</button>
           )}
-          {eligible.map((pid) => (
-            <div key={pid}>
-              <span>
-                {nameOf(pid)} (score {game.state.scores[pid]})
-              </span>{' '}
-              <label>
-                Wager{' '}
-                <input type="number" min={0} value={wager} onChange={(e) => setWager(e.target.value)} />
-              </label>{' '}
-              <button onClick={() => act(game.id, { type: 'finalWager', responderId: pid, wager: Number(wager), correct: true })}>
-                Correct
-              </button>{' '}
-              <button onClick={() => act(game.id, { type: 'finalWager', responderId: pid, wager: Number(wager), correct: false })}>
-                Incorrect
-              </button>
-            </div>
-          ))}
-          <p>
+          <div className="stack">
+            {eligible.map((pid) => (
+              <div key={pid} className="btn-row">
+                <span>
+                  {nameOf(pid)} (score {game.state.scores[pid]})
+                </span>
+                <label>
+                  Wager{' '}
+                  <input type="number" min={0} value={wager} onChange={(e) => setWager(e.target.value)} />
+                </label>
+                <button onClick={() => act(game.id, { type: 'finalWager', responderId: pid, wager: Number(wager), correct: true })}>
+                  Correct
+                </button>
+                <button onClick={() => act(game.id, { type: 'finalWager', responderId: pid, wager: Number(wager), correct: false })}>
+                  Incorrect
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="btn-row">
             <button onClick={() => act(game.id, { type: 'finishFinal' })}>Finish game</button>
-          </p>
+          </div>
         </div>
       )
     }
@@ -214,10 +232,10 @@ export default function JeopardyScreen() {
       <h1>What is… Panda? — done</h1>
       <h2>Points earned</h2>
       <PointSummary awards={game.result?.awards ?? []} />
-      <p>
-        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>{' '}
+      <div className="btn-row">
+        <button onClick={() => navigate(`/session/${sessionId}`)}>Back to main screen</button>
         <button onClick={() => setDismissFinished(true)}>Start a new game</button>
-      </p>
+      </div>
     </div>
   )
 }

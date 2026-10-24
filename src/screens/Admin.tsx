@@ -38,7 +38,7 @@ function ParticipantRow({
           Save
         </button>
       </td>
-      <td data-testid={`points-${participant.name}`}>{participant.points}</td>
+      <td className="num" data-testid={`points-${participant.name}`}>{participant.points}</td>
       <td>
         <input
           type="number"
@@ -98,15 +98,17 @@ export default function Admin() {
 
   return (
     <div className="page">
-      <h1>Admin — {session.name}</h1>
-      <Link className="btn-link" to={`/session/${session.id}`}>← Session</Link>
+      <div className="page-head">
+        <h1>Admin — {session.name}</h1>
+        <Link className="btn-link" to={`/session/${session.id}`}>← Session</Link>
+      </div>
 
       <h2>Participants</h2>
       <table>
         <thead>
           <tr>
             <th>Name</th>
-            <th>Points</th>
+            <th className="num">Points</th>
             <th>Override</th>
             <th></th>
           </tr>
@@ -131,15 +133,18 @@ export default function Admin() {
       />
 
       <h2>Storage</h2>
-      <button onClick={() => exportState(state)}>Export state</button>{' '}
-      <button onClick={() => fileRef.current?.click()}>Import state</button>{' '}
-      <button
-        onClick={() => {
-          if (window.confirm('Clear all state?')) dispatch({ type: 'clearState' })
-        }}
-      >
-        Clear all
-      </button>
+      <div className="btn-row">
+        <button onClick={() => exportState(state)}>Export state</button>
+        <button onClick={() => fileRef.current?.click()}>Import state</button>
+        <button
+          className="btn-danger"
+          onClick={() => {
+            if (window.confirm('Clear all state?')) dispatch({ type: 'clearState' })
+          }}
+        >
+          Clear all
+        </button>
+      </div>
       <input
         ref={fileRef}
         type="file"

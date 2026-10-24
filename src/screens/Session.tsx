@@ -4,11 +4,11 @@ import Scoreboard from '../components/Scoreboard'
 import ParticipantForm from '../components/ParticipantForm'
 import type { GameKind } from '../types'
 
-const CATALOG: { kind: GameKind; title: string }[] = [
-  { kind: 'boardGame', title: 'Board Game' },
-  { kind: 'fighting', title: 'Fighting Game' },
-  { kind: 'feud', title: 'Fábio-ly Feud' },
-  { kind: 'jeopardy', title: 'What is… Panda?' },
+const CATALOG: { kind: GameKind; title: string; blurb: string }[] = [
+  { kind: 'boardGame', title: 'Board Game', blurb: 'Pick your winners and hand out points.' },
+  { kind: 'fighting', title: 'Fighting Game', blurb: 'A knockout bracket — last one standing.' },
+  { kind: 'feud', title: 'Fábio-ly Feud', blurb: 'Two teams face off over survey answers.' },
+  { kind: 'jeopardy', title: 'What is… Panda?', blurb: 'A trivia board of clues and wagers.' },
 ]
 
 export default function Session() {
@@ -23,9 +23,13 @@ export default function Session() {
 
   return (
     <div className="page">
-      <h1>{session.name}</h1>
-      <Link className="btn-link" to="/">← Sessions</Link>{' '}
-      <Link className="btn-link" to={`/session/${session.id}/admin`}>Admin</Link>
+      <div className="page-head">
+        <h1>{session.name}</h1>
+        <div className="btn-row">
+          <Link className="btn-link" to="/">← Sessions</Link>
+          <Link className="btn-link" to={`/session/${session.id}/admin`}>Admin</Link>
+        </div>
+      </div>
 
       <Scoreboard participants={session.participants} />
 
@@ -52,6 +56,7 @@ export default function Session() {
             aria-disabled={inProgress}
           >
             <span className="menu-card-title">{g.title}</span>
+            <span className="menu-card-blurb">{g.blurb}</span>
           </Link>
         ))}
       </div>
