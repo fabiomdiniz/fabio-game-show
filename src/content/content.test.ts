@@ -1,24 +1,21 @@
 import { describe, it, expect } from 'vitest'
-import { feudCategories, findFeudQuestion } from './feud'
+import { feudQuestions, findFeudQuestion } from './feud'
 import { jeopardyBoard, findJeopardyCategory } from './jeopardy'
 
 describe('bundled content', () => {
-  it('feud categories, questions, and answers are well-formed', () => {
-    expect(feudCategories.length).toBeGreaterThan(0)
-    for (const category of feudCategories) {
-      expect(category.questions.length).toBeGreaterThan(0)
-      for (const q of category.questions) {
-        expect(q.answers.length).toBeGreaterThanOrEqual(2)
-        for (const a of q.answers) {
-          expect(a.text.trim().length).toBeGreaterThan(0)
-          expect(a.points).toBeGreaterThanOrEqual(0)
-        }
+  it('feud questions and answers are well-formed', () => {
+    expect(feudQuestions.length).toBeGreaterThan(0)
+    for (const q of feudQuestions) {
+      expect(q.answers.length).toBeGreaterThanOrEqual(2)
+      for (const a of q.answers) {
+        expect(a.text.trim().length).toBeGreaterThan(0)
+        expect(a.points).toBeGreaterThanOrEqual(0)
       }
     }
   })
 
   it('findFeudQuestion resolves bundled ids', () => {
-    const q = feudCategories[0].questions[0]
+    const q = feudQuestions[0]
     expect(findFeudQuestion(q.id)).toBe(q)
     expect(findFeudQuestion('does-not-exist')).toBeUndefined()
   })

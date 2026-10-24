@@ -119,11 +119,6 @@ export interface FeudQuestion {
   question: string
   answers: FeudAnswer[]
 }
-export interface FeudCategory {
-  id: string
-  name: string
-  questions: FeudQuestion[]
-}
 export type FeudPhase = 'faceOff' | 'board' | 'steal' | 'done'
 export interface FeudRoundState {
   phase: FeudPhase

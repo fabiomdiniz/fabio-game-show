@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { feudDefinition as def } from './definition'
-import { feudCategories } from '../../content/feud'
+import { feudQuestions } from '../../content/feud'
 
-const q = feudCategories[0].questions[0] // 4 answers, first worth 40
+const q = feudQuestions[0] // 10 answers, first worth 50
 const config = {
   teamA: { name: 'Team A', playerIds: ['a1', 'a2'] },
   teamB: { name: 'Team B', playerIds: ['b1'] },
@@ -92,10 +92,10 @@ describe('feud definition', () => {
   it('credits every player on the controlling team when all answers are revealed', () => {
     let s = start()
     s = def.applyAction(s, { type: 'faceOffWinner', team: 'A' }).state
-    s = def.applyAction(s, { type: 'reveal', answerIndex: 0 }).state
-    s = def.applyAction(s, { type: 'reveal', answerIndex: 1 }).state
-    s = def.applyAction(s, { type: 'reveal', answerIndex: 2 }).state
-    const r = def.applyAction(s, { type: 'reveal', answerIndex: 3 })
+    for (let i = 0; i < q.answers.length - 1; i++) {
+      s = def.applyAction(s, { type: 'reveal', answerIndex: i }).state
+    }
+    const r = def.applyAction(s, { type: 'reveal', answerIndex: q.answers.length - 1 })
     const total = q.answers.reduce((sum, a) => sum + a.points, 0)
     expect(r.deltas).toEqual(
       config.teamA.playerIds.map((participantId) => ({ participantId, delta: total })),
