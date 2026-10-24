@@ -7,6 +7,7 @@ import Sessions from './screens/Sessions'
 import Session from './screens/Session'
 import GameScreen from './screens/GameScreen'
 import Admin from './screens/Admin'
+import FeudAdmin from './games/feud/FeudAdmin'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             </span>
             <nav className="topnav" aria-label="Primary">
               <Link to="/">Sessions</Link>
+              <Link to="/feud-admin">Feud Admin</Link>
             </nav>
           </header>
           <div className="checker" aria-hidden="true"></div>
@@ -32,6 +34,7 @@ export default function App() {
               <Route path="/session/:id" element={<Session />} />
               <Route path="/session/:id/game/:kind" element={<GameScreen />} />
               <Route path="/session/:id/admin" element={<Admin />} />
+              <Route path="/feud-admin" element={<FeudAdmin />} />
             </Routes>
           </main>
           <footer className="site-footer">

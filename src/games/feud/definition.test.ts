@@ -32,11 +32,25 @@ describe('feud definition', () => {
     ).toMatch(/question/)
   })
 
-  it('face-off reveals the top answer', () => {
+  it('face-off sets the controlling team without revealing an answer', () => {
     const s = start()
     const r = def.applyAction(s, { type: 'faceOffWinner', team: 'A' })
     expect(r.state.round.phase).toBe('board')
     expect(r.state.round.controllingTeam).toBe('A')
+    expect(r.state.round.revealed).toEqual([])
+    expect(r.state.round.roundTotal).toBe(0)
+  })
+
+  it('face-off guesses reveal answers and control carries them to the board', () => {
+    let s = start()
+    s = def.applyAction(s, { type: 'reveal', answerIndex: 0 }).state
+    expect(s.round.phase).toBe('faceOff')
+    expect(s.round.revealed).toEqual([0])
+    expect(s.round.roundTotal).toBe(q.answers[0].points)
+
+    const r = def.applyAction(s, { type: 'faceOffWinner', team: 'B' })
+    expect(r.state.round.phase).toBe('board')
+    expect(r.state.round.controllingTeam).toBe('B')
     expect(r.state.round.revealed).toEqual([0])
     expect(r.state.round.roundTotal).toBe(q.answers[0].points)
   })
@@ -53,7 +67,11 @@ describe('feud definition', () => {
     expect(r.deltas).toEqual(
       config.teamB.playerIds.map((participantId) => ({ participantId, delta: s.round.roundTotal })),
     )
-    expect(r.state.finished).toBe(true)
+    expect(r.state.round.phase).toBe('done')
+    expect(r.state.round.winner).toBe('B')
+    expect(r.state.finished).toBe(false)
+    const advanced = def.applyAction(r.state, { type: 'nextQuestion' })
+    expect(advanced.state.finished).toBe(true)
   })
 
   it('a failed steal credits every player on the controlling team and finishes the round', () => {
@@ -66,12 +84,15 @@ describe('feud definition', () => {
     expect(r.deltas).toEqual(
       config.teamA.playerIds.map((participantId) => ({ participantId, delta: s.round.roundTotal })),
     )
-    expect(r.state.finished).toBe(true)
+    expect(r.state.round.phase).toBe('done')
+    expect(r.state.round.winner).toBe('A')
+    expect(r.state.finished).toBe(false)
   })
 
   it('credits every player on the controlling team when all answers are revealed', () => {
     let s = start()
     s = def.applyAction(s, { type: 'faceOffWinner', team: 'A' }).state
+    s = def.applyAction(s, { type: 'reveal', answerIndex: 0 }).state
     s = def.applyAction(s, { type: 'reveal', answerIndex: 1 }).state
     s = def.applyAction(s, { type: 'reveal', answerIndex: 2 }).state
     const r = def.applyAction(s, { type: 'reveal', answerIndex: 3 })
@@ -79,6 +100,8 @@ describe('feud definition', () => {
     expect(r.deltas).toEqual(
       config.teamA.playerIds.map((participantId) => ({ participantId, delta: total })),
     )
-    expect(r.state.finished).toBe(true)
+    expect(r.state.round.phase).toBe('done')
+    expect(r.state.round.winner).toBe('A')
+    expect(r.state.finished).toBe(false)
   })
 })

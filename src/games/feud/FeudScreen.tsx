@@ -2,12 +2,23 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/StoreContext'
 import { feudCategories } from '../../content/feud'
+import { matchAnswerIndex } from './definition'
 import PointSummary from '../../components/PointSummary'
+import wrongAnswerSound from './assets/wrong-answer-sound-effect.mp3'
+
+function playStrikeSound() {
+  try {
+    const audio = new Audio(wrongAnswerSound)
+    void audio.play().catch(() => {})
+  } catch {
+    // audio unavailable (e.g. test environment) — ignore
+  }
+}
 
 export default function FeudScreen() {
   const { id: sessionId } = useParams()
   const navigate = useNavigate()
-  const { state, beginGame, act } = useStore()
+  const { state, beginGame, act, abandonGame } = useStore()
   const session = state.sessions.find((s) => s.id === sessionId)
 
   const [teamAPlayers, setTeamAPlayers] = useState<string[]>([])
@@ -16,6 +27,8 @@ export default function FeudScreen() {
   const [teamBName, setTeamBName] = useState('Team B')
   const [questionIds, setQuestionIds] = useState<string[]>([])
   const [dismissFinished, setDismissFinished] = useState(false)
+  const [guess, setGuess] = useState('')
+  const [wrongGuess, setWrongGuess] = useState(false)
 
   const activeGame = session?.games.find((g) => g.kind === 'feud' && g.status !== 'finished')
 
@@ -47,6 +60,25 @@ export default function FeudScreen() {
       setTeamBPlayers((ids) => (ids.includes(pid) ? ids.filter((x) => x !== pid) : [...ids, pid]))
       setTeamAPlayers((ids) => ids.filter((x) => x !== pid))
     }
+    const selectAllQuestions = () => {
+      setQuestionIds(feudCategories.flatMap((c) => c.questions.map((q) => q.id)))
+    }
+    const shuffle = (ids: string[]) => {
+      const a = [...ids]
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const tmp = a[i]
+        a[i] = a[j]
+        a[j] = tmp
+      }
+      return a
+    }
+    const randomlyBalanceTeams = () => {
+      const shuffled = shuffle(individuals.map((p) => p.id))
+      const mid = Math.ceil(shuffled.length / 2)
+      setTeamAPlayers(shuffled.slice(0, mid))
+      setTeamBPlayers(shuffled.slice(mid))
+    }
     const canStart =
       teamAPlayers.length > 0 &&
       teamBPlayers.length > 0 &&
@@ -67,7 +99,12 @@ export default function FeudScreen() {
             <input value={teamBName} onChange={(e) => setTeamBName(e.target.value)} aria-label="Team B name" />
           </label>
         </div>
-        <p>Assign players to teams:</p>
+        <p>
+          Assign players to teams:{' '}
+          <button type="button" onClick={randomlyBalanceTeams}>
+            Randomly balance teams
+          </button>
+        </p>
         <div style={{ display: 'flex', gap: 24 }}>
           <fieldset>
             <legend>Team A players</legend>
@@ -98,7 +135,12 @@ export default function FeudScreen() {
             ))}
           </fieldset>
         </div>
-        <p>Select questions:</p>
+        <p>
+          Select questions:{' '}
+          <button type="button" onClick={selectAllQuestions}>
+            Select all questions
+          </button>
+        </p>
         {feudCategories.map((cat) => (
           <div key={cat.id}>
             <strong>{cat.name}</strong>
@@ -148,6 +190,30 @@ export default function FeudScreen() {
         : round.controllingTeam === 'B'
           ? game.state.teamA
           : null
+    const winnerTeamName =
+      round.winner === 'A' ? game.state.teamA.name : round.winner === 'B' ? game.state.teamB.name : null
+    const isLastQuestion = game.state.questionIndex + 1 >= game.state.questions.length
+
+    const submitGuess = () => {
+      const idx = matchAnswerIndex(q, guess)
+      if (round.phase === 'steal') {
+        // Steal: correct only if the typed answer is an unrevealed board answer.
+        const stolen = idx >= 0 && !round.revealed.includes(idx)
+        act(game.id, { type: 'stealResult', correct: stolen })
+      } else if (idx >= 0 && !round.revealed.includes(idx)) {
+        // face-off / board: reveal the matching answer, or flag a miss.
+        act(game.id, { type: 'reveal', answerIndex: idx })
+        setWrongGuess(false)
+      } else {
+        setWrongGuess(true)
+      }
+      setGuess('')
+    }
+
+    const startNewGame = () => {
+      abandonGame(game.id)
+      setDismissFinished(true)
+    }
 
     return (
       <div className="page">
@@ -156,46 +222,129 @@ export default function FeudScreen() {
           Question {game.state.questionIndex + 1} of {game.state.questions.length}: {q.question}
         </p>
 
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Answer</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            {q.answers.map((a, i) => (
+              <tr key={i}>
+                <td>{i + 1}</td>
+                <td>{round.revealed.includes(i) ? a.text : '???'}</td>
+                <td>{a.points}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
         {round.phase === 'faceOff' && (
           <div>
-            <p>Who won the face-off?</p>
-            <button onClick={() => act(game.id, { type: 'faceOffWinner', team: 'A' })}>
+            <p>Face-off: type each team's answer below, then choose who controls (higher answer wins).</p>
+            <p>Who controls the board?</p>
+            <button
+              onClick={() => {
+                act(game.id, { type: 'faceOffWinner', team: 'A' })
+                setGuess('')
+                setWrongGuess(false)
+              }}
+            >
               {game.state.teamA.name}
             </button>{' '}
-            <button onClick={() => act(game.id, { type: 'faceOffWinner', team: 'B' })}>
+            <button
+              onClick={() => {
+                act(game.id, { type: 'faceOffWinner', team: 'B' })
+                setGuess('')
+                setWrongGuess(false)
+              }}
+            >
               {game.state.teamB.name}
             </button>
           </div>
         )}
 
-        {(round.phase === 'board' || round.phase === 'steal') && (
+        {(round.phase === 'faceOff' || round.phase === 'board' || round.phase === 'steal') && (
           <div>
-            <p>
-              Round total: {round.roundTotal} — controlling: {controllingTeam!.name} —
-              strikes: {round.strikes}/3
-            </p>
-            <ul>
-              {q.answers.map((a, i) => (
-                <li key={i}>
-                  {round.revealed.includes(i) ? `${a.text} — ${a.points}` : '???'}{' '}
-                  {round.phase === 'board' && !round.revealed.includes(i) && (
-                    <button onClick={() => act(game.id, { type: 'reveal', answerIndex: i })}>Reveal</button>
-                  )}
-                </li>
-              ))}
-            </ul>
             {round.phase === 'board' && (
-              <button onClick={() => act(game.id, { type: 'strike' })}>Strike</button>
+              <p>
+                Round total: {round.roundTotal} — controlling: {controllingTeam!.name}
+              </p>
             )}
             {round.phase === 'steal' && (
-              <div>
-                <p>Steal by {otherTeam!.name}:</p>
-                <button onClick={() => act(game.id, { type: 'stealResult', correct: true })}>Correct</button>{' '}
-                <button onClick={() => act(game.id, { type: 'stealResult', correct: false })}>Incorrect</button>
+              <p>Steal by {otherTeam!.name}: type their answer — if it's on the board, they steal.</p>
+            )}
+            {(round.phase === 'board' || round.phase === 'steal') && (
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 14,
+                  fontSize: '2.75rem',
+                  lineHeight: 1,
+                  margin: '4px 0 12px',
+                }}
+                role="img"
+                aria-label={`${round.strikes} of 3 strikes`}
+                data-testid="strikes"
+              >
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    aria-hidden="true"
+                    style={{
+                      color: i < round.strikes ? '#b00020' : '#d9d9d9',
+                      fontWeight: 900,
+                      textShadow: i < round.strikes ? '0 2px 6px rgba(176, 0, 32, 0.45)' : 'none',
+                    }}
+                  >
+                    ✕
+                  </span>
+                ))}
               </div>
             )}
+            <input
+              value={guess}
+              onChange={(e) => {
+                setGuess(e.target.value)
+                setWrongGuess(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') submitGuess()
+              }}
+              placeholder="Type the answer…"
+              aria-label="answer"
+            />{' '}
+            <button onClick={submitGuess}>{round.phase === 'steal' ? 'Check' : 'Reveal answer'}</button>{' '}
+            {round.phase === 'board' && (
+              <button
+                onClick={() => {
+                  act(game.id, { type: 'strike' })
+                  playStrikeSound()
+                }}
+              >
+                Strike
+              </button>
+            )}
+            {wrongGuess && <p style={{ color: '#b00020' }}>Not on the board</p>}
           </div>
         )}
+
+        {round.phase === 'done' && (
+          <div>
+            <h2>Round over</h2>
+            <p>Round total: {round.roundTotal} points</p>
+            {winnerTeamName && <p>Points awarded to {winnerTeamName}</p>}
+            <button onClick={() => act(game.id, { type: 'nextQuestion' })}>
+              {isLastQuestion ? 'Finish' : 'Next question'}
+            </button>
+          </div>
+        )}
+
+        <p>
+          <button onClick={startNewGame}>Start a new game</button>
+        </p>
       </div>
     )
   }
