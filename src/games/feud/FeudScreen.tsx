@@ -103,8 +103,8 @@ export default function FeudScreen() {
             <input value={teamBName} onChange={(e) => setTeamBName(e.target.value)} aria-label="Team B name" />
           </label>
         </div>
-        <h2>Teams</h2>
-        <div className="btn-row">
+        <div className="section-row">
+          <h2>Teams</h2>
           <button type="button" onClick={randomlyBalanceTeams}>
             Randomly balance teams
           </button>
@@ -143,13 +143,13 @@ export default function FeudScreen() {
             </div>
           </fieldset>
         </div>
-        <h2>Questions</h2>
-        <div className="btn-row">
+        <div className="section-row">
+          <h2>Questions</h2>
           <button type="button" onClick={selectAllQuestions}>
             Select all questions
           </button>
         </div>
-        <div className="check-list">
+        <div className="check-list check-list--grid">
           {feudQuestions.map((q) => (
             <label key={q.id} className="check-row">
               <input
@@ -234,8 +234,15 @@ export default function FeudScreen() {
 
     return (
       <div className="page">
-        <h1>Fábio-ly Feud</h1>
-        <div style={{ display: 'flex', gap: 24, margin: '0 0 12px', fontSize: '1.15rem' }}>
+        <div className="page-head">
+          <h1>Fábio-ly Feud</h1>
+          <div className="btn-row">
+            <button onClick={() => act(game.id, { type: 'endGame' })}>End game</button>
+            <button onClick={startNewGame}>Start a new game</button>
+          </div>
+        </div>
+
+        <div className="feud-scorebar">
           <span data-testid="team-a-score">
             <strong>{game.state.teamA.name}</strong> — {teamAPoints} points
           </span>
@@ -243,143 +250,147 @@ export default function FeudScreen() {
             <strong>{game.state.teamB.name}</strong> — {teamBPoints} points
           </span>
         </div>
-        <p>
-          Question {game.state.questionIndex + 1} of {game.state.questions.length}: {q.question}
-        </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Answer</th>
-              <th>Points</th>
-            </tr>
-          </thead>
-          <tbody>
-            {q.answers.map((a, i) => (
-              <tr key={i}>
-                <td>{i + 1}</td>
-                <td>{round.revealed.includes(i) ? a.text : '???'}</td>
-                <td>{a.points}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="feud-board">
+          <div className="feud-board-main">
+            <p>
+              Question {game.state.questionIndex + 1} of {game.state.questions.length}: {q.question}
+            </p>
 
-        {round.phase === 'faceOff' && (
-          <div className="stack">
-            <p>Face-off: type each team's answer below, then choose who controls (higher answer wins).</p>
-            <p>Who controls the board?</p>
-            <div className="btn-row">
-              <button
-                onClick={() => {
-                  act(game.id, { type: 'faceOffWinner', team: 'A' })
-                  setGuess('')
-                  setWrongGuess(false)
-                }}
-              >
-                {game.state.teamA.name}
-              </button>
-              <button
-                onClick={() => {
-                  act(game.id, { type: 'faceOffWinner', team: 'B' })
-                  setGuess('')
-                  setWrongGuess(false)
-                }}
-              >
-                {game.state.teamB.name}
-              </button>
-            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Answer</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                {q.answers.map((a, i) => (
+                  <tr key={i}>
+                    <td>{i + 1}</td>
+                    <td>{round.revealed.includes(i) ? a.text : '???'}</td>
+                    <td>{a.points}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
 
-        {(round.phase === 'faceOff' || round.phase === 'board' || round.phase === 'steal') && (
-          <div className="stack">
-            {round.phase === 'board' && (
-              <p>
-                Round total: {round.roundTotal} — controlling: {controllingTeam!.name}
-              </p>
-            )}
-            {round.phase === 'steal' && (
-              <p>Steal by {otherTeam!.name}: type their answer — if it's on the board, they steal.</p>
-            )}
-            {(round.phase === 'board' || round.phase === 'steal') && (
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 14,
-                  fontSize: '2.75rem',
-                  lineHeight: 1,
-                  margin: '4px 0 12px',
-                }}
-                role="img"
-                aria-label={`${round.strikes} of 3 strikes`}
-                data-testid="strikes"
-              >
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    aria-hidden="true"
-                    style={{
-                      color: i < round.strikes ? '#b00020' : '#d9d9d9',
-                      fontWeight: 900,
-                      textShadow: i < round.strikes ? '0 2px 6px rgba(176, 0, 32, 0.45)' : 'none',
+          <div className="feud-controls">
+            {round.phase === 'faceOff' && (
+              <div className="stack">
+                <p>Face-off: type each team's answer below, then choose who controls (higher answer wins).</p>
+                <p>Who controls the board?</p>
+                <div className="btn-row">
+                  <button
+                    onClick={() => {
+                      act(game.id, { type: 'faceOffWinner', team: 'A' })
+                      setGuess('')
+                      setWrongGuess(false)
                     }}
                   >
-                    ✕
-                  </span>
-                ))}
+                    {game.state.teamA.name}
+                  </button>
+                  <button
+                    onClick={() => {
+                      act(game.id, { type: 'faceOffWinner', team: 'B' })
+                      setGuess('')
+                      setWrongGuess(false)
+                    }}
+                  >
+                    {game.state.teamB.name}
+                  </button>
+                </div>
               </div>
             )}
-            <input
-              value={guess}
-              onChange={(e) => {
-                setGuess(e.target.value)
-                setWrongGuess(false)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') submitGuess()
-              }}
-              placeholder="Type the answer…"
-              aria-label="answer"
-            />{' '}
-            <button onClick={submitGuess}>{round.phase === 'steal' ? 'Check' : 'Reveal answer'}</button>{' '}
-            {round.phase === 'board' && (
-              <button
-                onClick={() => {
-                  act(game.id, { type: 'strike' })
-                  playStrikeSound()
-                }}
-              >
-                Strike
-              </button>
-            )}
-            {wrongGuess && <p style={{ color: '#b00020' }}>Not on the board</p>}
-          </div>
-        )}
 
-        {round.phase === 'done' && (
-          <div>
-            <h2>Round over</h2>
-            {wasSteal && (
-              <p>
-                {round.winner !== round.controllingTeam
-                  ? 'Steal successful — the stealing team takes the round.'
-                  : 'Steal failed — the controlling team keeps the round.'}
-              </p>
+            {(round.phase === 'faceOff' || round.phase === 'board' || round.phase === 'steal') && (
+              <div className="stack">
+                {round.phase === 'board' && (
+                  <p>
+                    Round total: {round.roundTotal} — controlling: {controllingTeam!.name}
+                  </p>
+                )}
+                {round.phase === 'steal' && (
+                  <p>Steal by {otherTeam!.name}: type their answer — if it's on the board, they steal.</p>
+                )}
+                {(round.phase === 'board' || round.phase === 'steal') && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 14,
+                      fontSize: '2.75rem',
+                      lineHeight: 1,
+                      margin: '4px 0 12px',
+                    }}
+                    role="img"
+                    aria-label={`${round.strikes} of 3 strikes`}
+                    data-testid="strikes"
+                  >
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        aria-hidden="true"
+                        style={{
+                          color: i < round.strikes ? '#b00020' : '#d9d9d9',
+                          fontWeight: 900,
+                          textShadow: i < round.strikes ? '0 2px 6px rgba(176, 0, 32, 0.45)' : 'none',
+                        }}
+                      >
+                        ✕
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <input
+                  value={guess}
+                  onChange={(e) => {
+                    setGuess(e.target.value)
+                    setWrongGuess(false)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') submitGuess()
+                  }}
+                  placeholder="Type the answer…"
+                  aria-label="answer"
+                />
+                <div className="btn-row">
+                  <button onClick={submitGuess}>{round.phase === 'steal' ? 'Check' : 'Reveal answer'}</button>
+                  {round.phase === 'board' && (
+                    <button
+                      onClick={() => {
+                        act(game.id, { type: 'strike' })
+                        playStrikeSound()
+                      }}
+                    >
+                      Strike
+                    </button>
+                  )}
+                </div>
+                {wrongGuess && <p style={{ color: '#b00020' }}>Not on the board</p>}
+              </div>
             )}
-            <p>Round total: {round.roundTotal} points</p>
-            {winnerTeamName && <p>Points awarded to {winnerTeamName}</p>}
-            <button onClick={() => act(game.id, { type: 'nextQuestion' })}>
-              {isLastQuestion ? 'Finish' : 'Next question'}
-            </button>
-          </div>
-        )}
 
-        <p>
-          <button onClick={() => act(game.id, { type: 'endGame' })}>End game</button>{' '}
-          <button onClick={startNewGame}>Start a new game</button>
-        </p>
+            {round.phase === 'done' && (
+              <div>
+                <h2>Round over</h2>
+                {wasSteal && (
+                  <p>
+                    {round.winner !== round.controllingTeam
+                      ? 'Steal successful — the stealing team takes the round.'
+                      : 'Steal failed — the controlling team keeps the round.'}
+                  </p>
+                )}
+                <p>Round total: {round.roundTotal} points</p>
+                {winnerTeamName && <p>Points awarded to {winnerTeamName}</p>}
+                <button onClick={() => act(game.id, { type: 'nextQuestion' })}>
+                  {isLastQuestion ? 'Finish' : 'Next question'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     )
   }

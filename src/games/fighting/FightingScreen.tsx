@@ -46,16 +46,18 @@ export default function FightingScreen() {
           <h1>Fighting Game</h1>
           <Link className="btn-link" to={`/session/${sessionId}`}>Back</Link>
         </div>
-        <h2>Select fighters</h2>
-        <p className="section-hint">Select fighters (individual players only):</p>
-        <div className="btn-row">
-          <button type="button" onClick={() => setEntrants(individuals.map((p) => p.id))}>
-            Select all
-          </button>
-          <button type="button" onClick={() => setEntrants([])}>
-            Clear
-          </button>
+        <div className="section-row">
+          <h2>Select fighters</h2>
+          <div className="btn-row">
+            <button type="button" onClick={() => setEntrants(individuals.map((p) => p.id))}>
+              Select all
+            </button>
+            <button type="button" onClick={() => setEntrants([])}>
+              Clear
+            </button>
+          </div>
         </div>
+        <p className="section-hint">Select fighters (individual players only):</p>
         <div className="check-list">
           {individuals.map((p) => (
             <label key={p.id} className="check-row">

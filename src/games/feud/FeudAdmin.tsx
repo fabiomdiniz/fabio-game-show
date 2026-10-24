@@ -14,29 +14,31 @@ export default function FeudAdmin() {
         ← Sessions
       </Link>
 
-      {feudQuestions.map((q) => (
-        <article key={q.id}>
-          <h2>
-            {q.question} <span className="muted-hint">{q.id}</span>
-          </h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Answer</th>
-                <th>Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              {q.answers.map((a, i) => (
-                <tr key={i}>
-                  <td>{a.text}</td>
-                  <td>{a.points}</td>
+      <div className="feed-grid">
+        {feudQuestions.map((q) => (
+          <article key={q.id}>
+            <h2>
+              {q.question} <span className="muted-hint">{q.id}</span>
+            </h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Answer</th>
+                  <th>Points</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </article>
-      ))}
+              </thead>
+              <tbody>
+                {q.answers.map((a, i) => (
+                  <tr key={i}>
+                    <td>{a.text}</td>
+                    <td>{a.points}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </article>
+        ))}
+      </div>
     </div>
   )
 }
