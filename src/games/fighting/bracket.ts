@@ -6,11 +6,22 @@ export function nextPowerOfTwo(n: number): number {
   return p
 }
 
-export function buildBracket(entrants: string[]): FightingMatch[][] {
+// Fisher–Yates with an injectable RNG (defaults to Math.random) so tests can
+// pass a deterministic source and the live app gets random pairings.
+function shuffle<T>(items: T[], rng: () => number): T[] {
+  const a = [...items]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+export function buildBracket(entrants: string[], rng: () => number = Math.random): FightingMatch[][] {
   const n = entrants.length
   if (n < 2) return []
   const size = nextPowerOfTwo(n)
-  const slots: (string | null)[] = [...entrants]
+  const slots: (string | null)[] = shuffle(entrants, rng)
   while (slots.length < size) slots.push(null)
 
   const first: FightingMatch[] = []
@@ -69,6 +80,35 @@ export function advance(
     break
   }
   return next
+}
+
+// Reverts a match's winner and clears the slot it fed into the next round.
+// Blocked when the downstream match (the fight that received this winner) has
+// itself already been decided, or for structural byes.
+export function undoWinner(rounds: FightingMatch[][], matchId: string): FightingMatch[][] {
+  for (let r = 0; r < rounds.length; r++) {
+    const idx = rounds[r].findIndex((m) => m.id === matchId)
+    if (idx === -1) continue
+    const match = rounds[r][idx]
+    if (!match.winnerId || match.bye) return rounds
+
+    if (r < rounds.length - 1) {
+      const downstream = rounds[r + 1][Math.floor(idx / 2)]
+      if (downstream?.winnerId) return rounds
+    }
+
+    const next = rounds.map((round) =>
+      round.map((m) => (m.id === matchId ? { ...m, winnerId: null } : m)),
+    )
+    if (r < rounds.length - 1) {
+      const slot: 'playerA' | 'playerB' = idx % 2 === 0 ? 'playerA' : 'playerB'
+      const targetIdx = Math.floor(idx / 2)
+      const target = next[r + 1][targetIdx]
+      if (target) next[r + 1][targetIdx] = { ...target, [slot]: null }
+    }
+    return next
+  }
+  return rounds
 }
 
 export function championOf(rounds: FightingMatch[][]): { champion: string | null; runnerUp: string | null } {

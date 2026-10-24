@@ -52,4 +52,37 @@ describe('Session', () => {
     expect(screen.queryByLabelText('Kind')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Members')).not.toBeInTheDocument()
   })
+
+  it('offers to resume the game already in progress', () => {
+    const { s, sid } = seed()
+    saveState(
+      reducer(s, {
+        type: 'startGame',
+        sessionId: sid,
+        instance: {
+          id: 'g1',
+          kind: 'boardGame',
+          status: 'setup',
+          config: { name: 'Board Game', pointValue: 5 },
+          state: { winners: [], pointValue: 5 },
+          initialPoints: {},
+          appliedDeltas: [],
+        },
+      }),
+    )
+    renderSession(sid)
+
+    expect(screen.getByText('Resume game').closest('a')).toHaveAttribute(
+      'href',
+      `/session/${sid}/game/boardGame`,
+    )
+  })
+
+  it('does not offer to resume when nothing is in progress', () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderSession(sid)
+
+    expect(screen.queryByText('Resume game')).not.toBeInTheDocument()
+  })
 })

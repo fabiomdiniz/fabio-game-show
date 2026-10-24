@@ -4,7 +4,7 @@ import type {
   FightingState,
   GameDefinition,
 } from '../../types'
-import { advance, buildBracket, championOf } from './bracket'
+import { advance, buildBracket, championOf, undoWinner } from './bracket'
 
 export const fightingDefinition: GameDefinition<
   'fighting',
@@ -29,7 +29,9 @@ export const fightingDefinition: GameDefinition<
     return null
   },
   applyAction: (s, a) => {
-    if (a.type !== 'advance') return { state: s, deltas: [] }
+    if (a.type === 'undo') {
+      return { state: { ...s, rounds: undoWinner(s.rounds, a.matchId) }, deltas: [] }
+    }
     const rounds = advance(s.rounds, a.matchId, a.winnerId)
     const { champion, runnerUp } = championOf(rounds)
     if (champion && runnerUp) {

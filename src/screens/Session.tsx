@@ -19,6 +19,7 @@ export default function Session() {
   if (!session) return <p className="page">Session not found.</p>
 
   const inProgress = session.games.some((g) => g.status === 'inProgress')
+  const activeGame = session.games.find((g) => g.status === 'inProgress')
 
   return (
     <div className="page">
@@ -35,7 +36,12 @@ export default function Session() {
       />
 
       <h2 className="menu-title">Main Menu</h2>
-      {inProgress && <p>A game is already in progress.</p>}
+      {activeGame && (
+        <p>
+          A game is already in progress.{' '}
+          <Link to={`/session/${session.id}/game/${activeGame.kind}`}>Resume game</Link>
+        </p>
+      )}
       <div className="menu-body">
         <div className="menu-preview" aria-hidden="true"></div>
         <ol className="menu-list">

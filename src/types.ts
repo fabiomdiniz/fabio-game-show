@@ -95,7 +95,9 @@ export interface FightingState {
   firstPlacePoints: number
   secondPlacePoints: number
 }
-export type FightingAction = { type: 'advance'; matchId: string; winnerId: string }
+export type FightingAction =
+  | { type: 'advance'; matchId: string; winnerId: string }
+  | { type: 'undo'; matchId: string }
 
 // ---- Feud ----
 export interface FeudTeam {
