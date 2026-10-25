@@ -11,6 +11,7 @@ import Admin from './screens/Admin'
 import FeudAdmin from './games/feud/FeudAdmin'
 import ImageAdmin from './screens/ImageAdmin'
 import PointGuidance from './screens/PointGuidance'
+import History from './screens/History'
 
 export default function App() {
   return (
@@ -41,9 +42,10 @@ export default function App() {
                 <Route path="/session/:id" element={<Session />} />
                 <Route path="/session/:id/game/:kind" element={<GameScreen />} />
                 <Route path="/session/:id/admin" element={<Admin />} />
+                <Route path="/session/:id/history" element={<History />} />
                 <Route path="/feud-admin" element={<FeudAdmin />} />
                 <Route path="/image-admin" element={<ImageAdmin />} />
-              <Route path="/point-guidance" element={<PointGuidance />} />
+                <Route path="/point-guidance" element={<PointGuidance />} />
               </Routes>
             </main>
             <footer className="site-footer">

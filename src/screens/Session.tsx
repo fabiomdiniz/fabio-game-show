@@ -28,6 +28,7 @@ export default function Session() {
         <div className="btn-row">
           <Link className="btn-link" to="/">← Sessions</Link>
           <Link className="btn-link" to={`/session/${session.id}/admin`}>Admin</Link>
+          <Link className="btn-link" to={`/session/${session.id}/history`}>History</Link>
         </div>
       </div>
 
