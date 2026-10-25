@@ -6,3 +6,5 @@ dist
 # Environment-local tooling (Reasonix)
 reasonix.toml
 .reasonix/
+.vercel
+.env*

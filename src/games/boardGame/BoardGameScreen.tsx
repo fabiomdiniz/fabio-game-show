@@ -10,7 +10,7 @@ export default function BoardGameScreen() {
   const session = state.sessions.find((s) => s.id === sessionId)
 
   const [name, setName] = useState('Board Game')
-  const [pointValue, setPointValue] = useState('1')
+  const [pointValue, setPointValue] = useState('12')
   const [winners, setWinners] = useState<string[]>([])
   const [dismissFinished, setDismissFinished] = useState(false)
 

@@ -14,7 +14,7 @@ export const boardGameDefinition: GameDefinition<
   kind: 'boardGame',
   title: 'Board Game',
   acceptedKinds: ['individual', 'team'],
-  initialConfig: () => ({ name: 'Board Game', pointValue: 1 }),
+  initialConfig: () => ({ name: 'Board Game', pointValue: 12 }),
   initialState: (c) => ({ winners: [], pointValue: c.pointValue }),
   validateConfig: (c) => {
     if (typeof c.name !== 'string' || c.name.trim() === '') return 'Name is required'

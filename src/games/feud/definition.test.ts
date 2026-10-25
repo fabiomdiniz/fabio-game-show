@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { feudDefinition as def } from './definition'
 import { feudQuestions } from '../../content/feud'
 
-const q = feudQuestions[0] // 10 answers, first worth 50
+const q = feudQuestions[0] // 10 answers, first worth 10
 const config = {
   teamA: { name: 'Team A', playerIds: ['a1', 'a2'] },
   teamB: { name: 'Team B', playerIds: ['b1'] },
@@ -63,12 +63,12 @@ describe('feud definition', () => {
     s = def.applyAction(s, { type: 'strike' }).state
     s = def.applyAction(s, { type: 'strike' }).state
     expect(s.round.phase).toBe('steal')
-    // Team B steals Wartortle (50) -> round total 45 + 50 = 95
+    // Team B steals Wartortle (10) -> round total 9 + 10 = 19
     const r = def.applyAction(s, { type: 'stealResult', correct: true, answerIndex: 0 })
     expect(r.deltas).toEqual(
-      config.teamB.playerIds.map((participantId) => ({ participantId, delta: 95 })),
+      config.teamB.playerIds.map((participantId) => ({ participantId, delta: q.answers[1].points + q.answers[0].points })),
     )
-    expect(r.state.round.roundTotal).toBe(95)
+    expect(r.state.round.roundTotal).toBe(q.answers[1].points + q.answers[0].points)
     expect(r.state.round.phase).toBe('done')
     expect(r.state.round.winner).toBe('B')
     expect(r.state.finished).toBe(false)
@@ -99,7 +99,7 @@ describe('feud definition', () => {
     }
     const r = def.applyAction(s, { type: 'reveal', answerIndex: q.answers.length - 1 })
     const total = q.answers.reduce((sum, a) => sum + a.points, 0)
-    // round total is split evenly across the 2 controlling players (275 -> 138 + 137)
+    // round total is split evenly across the 2 controlling players (55 -> 28 + 27)
     expect(r.deltas).toEqual([
       { participantId: 'a1', delta: Math.ceil(total / 2) },
       { participantId: 'a2', delta: Math.floor(total / 2) },

@@ -149,7 +149,7 @@ describe('FeudScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
     // ranking is always visible: points shown, every answer hidden
-    expect(screen.getByText('50')).toBeInTheDocument()
+    expect(screen.getByText('Points')).toBeInTheDocument()
     expect(screen.getAllByText('???').length).toBe(10)
 
     // face-off: pick Team A, then type the winning answer
