@@ -48,9 +48,6 @@ export default function App() {
                 <Route path="/point-guidance" element={<PointGuidance />} />
               </Routes>
             </main>
-            <footer className="site-footer">
-              <span>Fábio Game Show</span>
-            </footer>
           </div>
         </BrowserRouter>
       </StoreProvider>
