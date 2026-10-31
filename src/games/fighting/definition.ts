@@ -15,7 +15,7 @@ export const fightingDefinition: GameDefinition<
   kind: 'fighting',
   title: 'Fighting Game',
   acceptedKinds: ['individual'],
-  initialConfig: () => ({ firstPlacePoints: 10, secondPlacePoints: 5, entrants: [] }),
+  initialConfig: () => ({ firstPlacePoints: 8, secondPlacePoints: 4, entrants: [] }),
   initialState: (c) => ({
     rounds: buildBracket(c.entrants),
     firstPlacePoints: c.firstPlacePoints,
