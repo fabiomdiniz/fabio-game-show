@@ -83,6 +83,22 @@ export const feudQuestions: FeudQuestion[] = [
       { text: 'Max Payne', points: 1 },
     ],
   },
+  {
+    id: 'fav-historical-figures',
+    question: 'Fábio Favorite Historical Figures',
+    answers: [
+      { text: 'Isaac Newton', points: 10 },
+      { text: 'Jesus', points: 9 },
+      { text: 'Moses', points: 8 },
+      { text: 'Hannibal', points: 7 },
+      { text: 'Marcus Aurelius', points: 6 },
+      { text: 'Laozi', points: 5 },
+      { text: 'Tariq ibn Ziyad', points: 4 },
+      { text: 'David Bowie', points: 3 },
+      { text: 'John Coltrane', points: 2 },
+      { text: 'Zheng He', points: 1 },
+    ],
+  },
 ]
 
 export function findFeudQuestion(id: string): FeudQuestion | undefined {
