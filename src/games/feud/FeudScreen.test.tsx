@@ -350,4 +350,30 @@ describe('FeudScreen', () => {
     expect(screen.getByText('Fábio-ly Feud — done')).toBeInTheDocument()
     expect(screen.getByTestId('winner')).toHaveTextContent(/Team A/)
   })
+
+  it('fires the celebration overlay on a correct answer, not on a miss', () => {
+    const { s, sid } = seed()
+    saveState(s)
+    renderFeud(sid)
+
+    fireEvent.click(screen.getByLabelText('assign-Ana-A'))
+    fireEvent.click(screen.getByLabelText('assign-Bruno-B'))
+    fireEvent.click(screen.getByLabelText(/Favorite Pokemons/))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    // into the board phase
+    fireEvent.click(screen.getByRole('button', { name: 'Team A' }))
+
+    // a miss shows the hint, no celebration
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Nope' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
+    expect(screen.getByText('Not on the board')).toBeInTheDocument()
+    expect(screen.queryByTestId('correct-celebration')).not.toBeInTheDocument()
+
+    // a hit reveals the answer and fires the celebration overlay
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Wartortle' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal answer' }))
+    expect(screen.getByText('Wartortle')).toBeInTheDocument()
+    expect(screen.getByTestId('correct-celebration')).toBeInTheDocument()
+  })
 })

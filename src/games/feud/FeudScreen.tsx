@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/StoreContext'
 import { feudQuestions } from '../../content/feud'
 import { matchAnswerIndex } from './definition'
 import PointSummary from '../../components/PointSummary'
 import wrongAnswerSound from './assets/wrong-answer-sound-effect.mp3'
+import correctAnswerSound from './assets/correct-answer-sound-effect.mp3'
 
 function playStrikeSound() {
   try {
@@ -14,6 +15,25 @@ function playStrikeSound() {
     // audio unavailable (e.g. test environment) — ignore
   }
 }
+
+function playCorrectSound() {
+  try {
+    const audio = new Audio(correctAnswerSound)
+    void audio.play().catch(() => {})
+  } catch {
+    // audio unavailable (e.g. test environment) — ignore
+  }
+}
+
+const CONFETTI_COLORS = [
+  'var(--color-accent)', // sega red
+  'var(--color-accent-2)', // green hill
+  'var(--color-paper-3)', // deeper gold
+  'var(--color-ink-2)', // indigo
+  'var(--color-paper)', // bright gold
+]
+
+type ConfettiStyle = CSSProperties & Record<`--${string}`, string>
 
 export default function FeudScreen() {
   const { id: sessionId } = useParams()
@@ -29,6 +49,7 @@ export default function FeudScreen() {
   const [dismissFinished, setDismissFinished] = useState(false)
   const [guess, setGuess] = useState('')
   const [wrongGuess, setWrongGuess] = useState(false)
+  const [celebrate, setCelebrate] = useState(0)
 
   const activeGame = session?.games.find((g) => g.kind === 'feud' && g.status !== 'finished')
 
@@ -218,9 +239,15 @@ export default function FeudScreen() {
       if (round.phase === 'steal') {
         // Steal: correct only if the typed answer is an unrevealed board answer.
         const stolen = idx >= 0 && !round.revealed.includes(idx)
+        if (stolen) {
+          playCorrectSound()
+          setCelebrate((n) => n + 1)
+        }
         act(game.id, { type: 'stealResult', correct: stolen, answerIndex: idx >= 0 ? idx : undefined })
       } else if (idx >= 0 && !round.revealed.includes(idx)) {
         // face-off / board: reveal the matching answer, or flag a miss.
+        playCorrectSound()
+        setCelebrate((n) => n + 1)
         act(game.id, { type: 'reveal', answerIndex: idx })
         setWrongGuess(false)
       } else {
@@ -393,6 +420,28 @@ export default function FeudScreen() {
             )}
           </div>
         </div>
+
+        {celebrate > 0 && (
+          <div
+            className="feud-celebrate"
+            key={celebrate}
+            aria-hidden="true"
+            data-testid="correct-celebration"
+          >
+            {Array.from({ length: 24 }).map((_, i) => {
+              const angle = (i / 24) * Math.PI * 2
+              const dist = 120 + (i % 4) * 40
+              const style: ConfettiStyle = {
+                background: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+                '--tx': `${Math.round(Math.cos(angle) * dist)}px`,
+                '--ty': `${Math.round(Math.sin(angle) * dist) - 50}px`,
+                '--rot': `${(i * 137) % 360}deg`,
+                '--d': `${(i % 6) * 25}ms`,
+              }
+              return <span key={i} className="feud-confetti" style={style} />
+            })}
+          </div>
+        )}
       </div>
     )
   }

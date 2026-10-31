@@ -997,6 +997,48 @@ main > * {
   }
 }
 
+.feud-celebrate {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+}
+
+.feud-confetti {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.6rem;
+  height: 0.85rem;
+  border-radius: 2px;
+  opacity: 0;
+  animation: feud-confetti-burst 900ms var(--ease-out) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes feud-confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.4);
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px)))
+      rotate(var(--rot, 0deg)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feud-confetti {
+    animation: none;
+    display: none;
+  }
+}
+
 .btn-row {
   display: flex;
   flex-wrap: wrap;
