@@ -11,8 +11,8 @@ export default function FightingScreen() {
   const { state, beginGame, act, abandonGame } = useStore()
   const session = state.sessions.find((s) => s.id === sessionId)
 
-  const [firstPlace, setFirstPlace] = useState('10')
-  const [secondPlace, setSecondPlace] = useState('5')
+  const [firstPlace, setFirstPlace] = useState('8')
+  const [secondPlace, setSecondPlace] = useState('4')
   const [entrants, setEntrants] = useState<string[]>([])
   const [dismissFinished, setDismissFinished] = useState(false)
 

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 // Session point reference: how to set points for a balanced session of
-// 3 fighting tournaments + 3 board games + 1 family feud.
+// 4 fighting tournaments + 2 board games + 1 family feud (7 players).
 const byPlayerCount = [
   { players: 7, feudTeams: '3 v 4', boardHalf: '3–4' },
   { players: 8, feudTeams: '4 v 4', boardHalf: '4' },
@@ -17,8 +17,9 @@ export default function PointGuidance() {
       </div>
 
       <p className="muted-hint">
-        Balanced so each game category caps a dominant player near 30 points; the
-        feud is the swing finale.
+        Balanced for 4 fighting tournaments, 2 board games and 1 family feud
+        (7 players). A clean sweep of the fighting tournaments lands near 30;
+        the feud is the swing finale.
       </p>
 
       <h2>Per game</h2>
@@ -32,13 +33,13 @@ export default function PointGuidance() {
         </thead>
         <tbody>
           <tr>
-            <td>Fighting (×3)</td>
+            <td>Fighting (×4)</td>
             <td>1st / 2nd place</td>
-            <td className="num">10 / 5 each</td>
+            <td className="num">8 / 4 each</td>
           </tr>
           <tr>
-            <td>Board game (×3)</td>
-            <td>2 winner-only games · 1 half-the-players game</td>
+            <td>Board game (×2)</td>
+            <td>1 winner-only game · 1 half-the-players game</td>
             <td className="num">12 winner · 6 each (half)</td>
           </tr>
           <tr>
@@ -70,9 +71,10 @@ export default function PointGuidance() {
       </table>
 
       <p className="muted-hint">
-        Feud full board = 55 points, split evenly among the winning team (team of
-        3 ~ 18 each, 4 ~ 14, 5 = 11). Board "half" = pick that many winners in the
-        half-the-players game at 6 points each.
+        Feud full board = 55 points per question, split evenly among the winning
+        team (team of 3 ~ 18 each, 4 ~ 14). Board "half" = pick that many winners
+        in the half-the-players game at 6 points each. With 7 fighters the bracket
+        has one bye.
       </p>
     </div>
   )
